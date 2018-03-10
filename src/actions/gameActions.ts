@@ -40,7 +40,7 @@ export default class GameActions {
 		if (moveCard) {
 			this.store.dispatch({
 				type: MOVE_CARD_EXCHANGE,
-				payload: {moveCard}
+				payload: { moveCard }
 			});
 		} else {
 			this.store.dispatch({

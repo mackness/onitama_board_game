@@ -21,7 +21,7 @@ import {
 	toggleActivePlayer
 } from '../utils';
 
-const initialState = Map({
+export const DEFAULT_STATE = Map({
 	board: fromJS([
 		[c.RED, 0, 0, 0, c.BLUE],
 		[c.RED, 0, 0, 0, c.BLUE],
@@ -184,7 +184,7 @@ const moveCardExchange = (state: any, moveCard: string) => {
 	return state.merge(_swapMoveCard(state, moveCard));
 };
 
-const gameReducer = (state = initialState, action: any) => {
+const gameReducer = (state = DEFAULT_STATE, action: any) => {
 	switch (action.type) {
 		case INITIAL_GAME_STATE:
 			return getInitialGameState(state);

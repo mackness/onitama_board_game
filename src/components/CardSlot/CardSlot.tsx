@@ -12,7 +12,7 @@ const CardSlot: React.StatelessComponent<CardSlotProps> = ({value}) => {
 		case c.BLUE:
 			return <div className='slot blue'>{value}</div>;
 		default:
-			return <div className='slot blue'>{value}</div>;
+			return <div className='slot'>{value}</div>;
 	}
 };
 
