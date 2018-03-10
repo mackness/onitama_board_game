@@ -1,6 +1,5 @@
 import gameReducer from '../gameReducer';
 import { Map, fromJS, List } from 'immutable';
-import { getSlotValue } from '../../utils';
 import c from '../../constants/game-constants';
 import { MOVE_CARD_EXCHANGE } from '../../constants/action-constants';
 
