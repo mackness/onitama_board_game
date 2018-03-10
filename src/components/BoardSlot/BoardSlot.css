@@ -1,0 +1,22 @@
+.slot {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 40px;
+	height: 40px;
+	border-bottom: 1px solid #000;
+}
+
+.slot:last-child {
+	border: 0;
+}
+
+.active {
+    color: white;
+    background-color: blue;
+}
+
+.candidate {
+    background-color: #ccc
+}
+

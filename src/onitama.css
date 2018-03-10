@@ -1,0 +1,47 @@
+html,
+body {
+	height: 100%;
+}
+
+body {
+	font-family: Helvetica Neue;
+	padding: 10px 20px;
+}
+
+#app {
+	width: 100%;
+}
+
+.board {
+	margin-right: 10px;
+}
+
+.cards {
+	width: 425px;
+	display: flex;
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+
+.card {
+	overflow: hidden;
+	border: solid 1px #000;
+	display: flex;
+	justify-content: space-around;
+}
+
+.card:first-child {
+	margin-right: 10px;
+}
+
+.row {
+	border-right: solid 1px #000;
+}
+
+.row:last-child {
+	border: 0;
+}
+
+.card1 {
+	margin-right: 10px;
+}
