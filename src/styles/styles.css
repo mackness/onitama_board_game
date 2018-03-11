@@ -34,11 +34,11 @@ body {
 	margin-right: 10px;
 }
 
-.row {
+.col {
 	border-right: solid 1px #000;
 }
 
-.row:last-child {
+.col:last-child {
 	border: 0;
 }
 

@@ -1,0 +1,30 @@
+
+.piece {
+	height: 20px;
+	width: 20px;
+	border-radius: 50%;
+    background-color: #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.piece--blue {
+    background-color: #69a1b0;
+}
+
+.piece--red {
+    background-color: #fe5a59
+}
+
+.piece--master:before {
+    content: " ";
+    position: absolute;
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    background-color: #666;
+}
+
+.piece--blue.piece--master:before {background-color: #296075;}
+.piece--red.piece--master:before {background-color: #cd2735;}

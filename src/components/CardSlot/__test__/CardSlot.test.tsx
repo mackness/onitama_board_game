@@ -6,6 +6,7 @@ import CardSlot from '../CardSlot';
 test('component', () => {
 	it('renders without crashing', () => {
 		const component = renderer.create(<CardSlot value={c.BLUE} />);
-		const json = component.toJSON();
+		const tree = component.toJSON();
+		expect(tree).toMatchSnapshot();
 	});
 });

@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Board } from '../../typings';
 import { getSlotValue } from '../../utils';
 import c from '../../constants/game-constants';
+import Piece from '../Piece';
 
 interface BoardSlotProps extends React.Props<BoardSlot> {
 	actions: any;
@@ -100,7 +101,7 @@ class BoardSlot extends React.Component<BoardSlotProps, BoardSlotState> {
 				].join(' ').trim()}
 				onClick={(event) => this._handleSlotClick(event, this.props.slotCoord)}
 			>
-			{this.props.slotValue}
+				<Piece value={this.props.slotValue} />
 			</div>
 		);
 	}

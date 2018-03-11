@@ -2,6 +2,7 @@
 	"name": "onitama",
 	"version": "0.1.0",
 	"private": true,
+	"homepage": "https://mackness.github.io/onitama",
 	"dependencies": {
 		"immutable": "^3.8.2",
 		"prop-types": "^15.6.1",
@@ -16,7 +17,9 @@
 		"start": "react-scripts-ts start",
 		"build": "react-scripts-ts build",
 		"test": "react-scripts-ts test --env=jsdom",
-		"eject": "react-scripts-ts eject"
+		"eject": "react-scripts-ts eject",
+		"predeploy": "react-scripts-ts build",
+		"deploy": "gh-pages -d build"
 	},
 	"devDependencies": {
 		"@types/jest": "^22.2.0",
@@ -25,6 +28,7 @@
 		"@types/react-dom": "^16.0.4",
 		"@types/react-redux": "^5.0.15",
 		"@types/react-test-renderer": "^16.0.1",
+		"gh-pages": "^1.1.0",
 		"react-test-renderer": "^16.2.0",
 		"typescript": "^2.7.2"
 	}

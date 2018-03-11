@@ -61,22 +61,22 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 			<div>
 				<div className='cards'>
 					<div className='card' data-card={c.RED_MOVE_CARD_1} onClick={this.handleMoveCardClick}>
-						{this.props.redMoveCard1.map((row: any, x) => (
-							<div className='row' key={x}>{row.map((slot: any, y: number) => (<CardSlot key={y} value={slot} />))}</div>
+						{this.props.redMoveCard1.map((col: any, x) => (
+							<div className='col' key={x}>{col.map((slot: any, y: number) => (<CardSlot key={y} value={slot} />))}</div>
 						))}
 					</div>
 					<div className='card' data-card={c.RED_MOVE_CARD_2} onClick={this.handleMoveCardClick}>
-						{this.props.redMoveCard2.map((row: any, x) => (
-							<div className='row' key={x}>{row.map((slot: any, y: number) => (<CardSlot key={y} value={slot} />))}</div>
+						{this.props.redMoveCard2.map((col: any, x) => (
+							<div className='col' key={x}>{col.map((slot: any, y: number) => (<CardSlot key={y} value={slot} />))}</div>
 						))}
 					</div>
 				</div>
 
 				<div className='cards'>
 					<div className='card board'>
-						{this.props.board.map((row: any, x) => (
-							<div className='row' key={x}>
-								{row.map((slot: any, y: number) => (
+						{this.props.board.map((col: any, x) => (
+							<div className='col' key={x}>
+								{col.map((slot: any, y: number) => (
 									<BoardSlot
 										key={y}
 										slotValue={slot}
@@ -88,21 +88,21 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 						))}
 					</div>
 					<div className='card' data-card='swapCard'>
-						{this.props.swapCard.map((row: any, x) => (
-							<div className='row' key={x}>{row.map((slot: any, y: number) => (<CardSlot key={y} value={slot} />))}</div>
+						{this.props.swapCard.map((col: any, x) => (
+							<div className='col' key={x}>{col.map((slot: any, y: number) => (<CardSlot key={y} value={slot} />))}</div>
 						))}
 					</div>
 				</div>
 
 				<div className='cards'>
 					<div className='card' data-card={c.BLUE_MOVE_CARD_1} onClick={this.handleMoveCardClick}>
-						{this.props.blueMoveCard1.map((row: any, x) => (
-							<div className='row' key={x}>{row.map((slot: any, y: number) => (<CardSlot key={y} value={slot} />))}</div>
+						{this.props.blueMoveCard1.map((col: any, x) => (
+							<div className='col' key={x}>{col.map((slot: any, y: number) => (<CardSlot key={y} value={slot} />))}</div>
 						))}
 					</div>
 					<div className='card blueMoveCard2' data-card={c.BLUE_MOVE_CARD_2} onClick={this.handleMoveCardClick}>
-						{this.props.blueMoveCard2.map((row: any, x) => (
-							<div className='row' key={x}>{row.map((slot: any, y: number) => (<CardSlot key={y} value={slot} />))}</div>
+						{this.props.blueMoveCard2.map((col: any, x) => (
+							<div className='col' key={x}>{col.map((slot: any, y: number) => (<CardSlot key={y} value={slot} />))}</div>
 						))}
 					</div>
 				</div>

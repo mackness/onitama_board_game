@@ -13,10 +13,9 @@
 
 .active {
     color: white;
-    background-color: blue;
+    background-color: #ccc;
 }
 
 .candidate {
-    background-color: #ccc
+    background-color: #ccc;
 }
-
