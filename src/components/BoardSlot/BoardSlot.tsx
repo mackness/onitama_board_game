@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Board } from '../../typings';
-import { getSlotValue } from '../../utils';
+import { getSlotValue, isOpponentSlot } from '../../utils';
 import c from '../../constants/game-constants';
 import Piece from '../Piece';
 
@@ -47,22 +47,21 @@ class BoardSlot extends React.Component<BoardSlotProps, BoardSlotState> {
 	}
 
 	/**
-	 * This function determines if the current slot is a candidate slot.
+	 * Is the current slot a candidate slot?
 	 * candidate slot algorithm:
 	 * - does the current slot coord match one of candidate coords
-	 * - is the slot value 0 OR is the slot value in the opponent's value range
-	 * @param {List} board             - current board.
+	 * - is the slot empty OR does the slot belong to the opponent
+	 * @param {List} board              - current board.
 	 * @param {Map}  slotCoord          - the end coordinate.
 	 * @param {Map}  candidateSlotCoord - the end coordinate.
 	 */
 	_isCandidateSlot = (board: Board, slotCoord: any, candidateCoord: any) => {
 		const slotValue = getSlotValue(board, candidateCoord);
-		const isBlueActive = this.props.activePlayer === c.BLUE;
+		const { activePlayer} = this.props;
 		return (
 			(slotCoord.get('x') === candidateCoord.get('x')) &&
 			(slotCoord.get('y') === candidateCoord.get('y')) &&
-			(slotValue === c.EMPTY ||
-			slotValue === (isBlueActive ? slotValue > c.BLUE_MASTER : slotValue < c.BLUE_MASTER))
+			(slotValue === c.EMPTY || isOpponentSlot(activePlayer, board, candidateCoord))
 		);
 	}
 
@@ -77,7 +76,7 @@ class BoardSlot extends React.Component<BoardSlotProps, BoardSlotState> {
 	}
 
 	_handleSlotClick = (event: any, coord: any) => {
-		if (event.target.classList.contains('candidate')) {
+		if (event.currentTarget.classList.contains('candidate')) {
 			this.props.actions.gameActions.handleCandidateSlotInteraction(coord);
 			this.props.actions.gameActions.handleMoveCardExchange();
 		} else {

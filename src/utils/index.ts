@@ -7,8 +7,8 @@ import { Board, Card, Coord } from '../typings';
  * @param {List} board - a 2d matrix of Immutable Lists.
  * @param {Map} coords - a Map of x y coordinates.
  */
-export function getSlotValue(board: Board, coords: any)  {
-	return board.getIn([coords.get('x'), coords.get('y')]);
+export function getSlotValue(board: Board, coord: any)  {
+	return board.getIn([coord.get('x'), coord.get('y')]);
 }
 
 /**
@@ -90,4 +90,23 @@ export function relativeCoordSearch(moveCoords: Coord, cardCoords: any) {
 			return null;
 		}
 	});
+}
+
+/**
+ * given the active player and a coord, determine if the slot belongs to the opponent.
+ * note: if blue is active then the value should be less than 150 (red master)
+ * if red is active, the value should be less than or equal to 250 (blue master) and greater than 150 (red master)
+ * @param {number} activePlayer the currently active player
+ * @param {Map} board an x, y coordiate pair
+ * @param {Map} candidateCoord an x, y coordiate pair
+ * @return {boolean} is opponent slot
+ */
+export function isOpponentSlot(activePlayer: number, board: any, coord: any): boolean {
+	const isBlueActive = activePlayer === c.BLUE;
+	const slotValue = getSlotValue(board, coord);
+	if (isBlueActive) {
+		return slotValue <= c.RED_MASTER && slotValue > 0;
+	} else {
+		return slotValue <= c.BLUE_MASTER && slotValue > c.RED_MASTER;
+	}
 }

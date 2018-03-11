@@ -5,6 +5,7 @@ import c from './constants/game-constants';
 import BoardSlot from './components/BoardSlot';
 import CardSlot from './components/CardSlot';
 import Debugger from './components/Debugger';
+import CapturedPieces from './components/CapturedPieces';
 import { Board, Card } from './typings';
 
 interface OnitamaProps extends React.Props<Onitama> {
@@ -106,6 +107,7 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 						))}
 					</div>
 				</div>
+				<CapturedPieces />
 				<Debugger state={this.props} />
 			</div>
 		);

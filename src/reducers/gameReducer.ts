@@ -13,6 +13,7 @@ import {
 
 import {
 	shuffle,
+	isOpponentSlot,
 	getAbsoluteCoords,
 	getRelativeCoords,
 	getRelativeCoord,
@@ -29,6 +30,10 @@ export const DEFAULT_STATE = Map({
 		[c.RED, 0, 0, 0, c.BLUE],
 		[c.RED, 0, 0, 0, c.BLUE]
 	]),
+	capturedPieces: Map({
+		red: List([0, 0, 0, 0, 0]),
+		blue: List([0, 0, 0, 0, 0]),
+	}),
 	swapCard: c.DEFAULT_CARD,
 	redMoveCard1: c.DEFAULT_CARD,
 	redMoveCard2: c.DEFAULT_CARD,
@@ -88,12 +93,37 @@ const handleSlotInteraction = (state: any, payload: any) => {
 	return state.merge(nextState);
 };
 
+const _getNextCapturedPieces = (state: any, coord: Coord) => {
+	let updated = false;
+	const board = state.get('board');
+	const activePlayer = state.get('activePlayer');
+	const activePlayerKey = activePlayer === c.BLUE ? 'blue' : 'red';
+
+	if (isOpponentSlot(activePlayer, board, coord)) {
+		const capturedPieces = state.getIn(['capturedPieces', activePlayerKey]);
+		const nextCapturedPieces = capturedPieces.map((piece: any) => {
+			if (piece === 0 && !updated) {
+				updated = true;
+				return getSlotValue(board, coord);
+			} else {
+				return piece;
+			}
+		});
+
+		const nextState = state.setIn(['capturedPieces', activePlayerKey], nextCapturedPieces);
+		return nextState.get('capturedPieces');
+	} else {
+		return state.get('capturedPieces');
+	}
+};
+
 const _getNextBoard = (state: any, coord: Coord) => {
 	const board = state.get('board');
 	const activeCoord = state.get('activeSlotCoord');
 
 	return board.updateIn([coord.get('x'), coord.get('y')], () => getSlotValue(board, activeCoord))
 				.updateIn([activeCoord.get('x'), activeCoord.get('y')], () => c.EMPTY);
+
 };
 
 const _getNextMoveHistory = (state: any, coord: Coord) => {
@@ -113,6 +143,7 @@ const _checkForWinner = (state: any) => {
 const performMove = (state: any, payload: any) => {
 	const nextState = Map({
 		board: _getNextBoard(state, payload.coord),
+		capturedPieces: _getNextCapturedPieces(state, payload.coord),
 		moveHistory: _getNextMoveHistory(state, payload.coord),
 		lastMoveRelativeCoords: getRelativeCoord(payload.coord, state.get('activeSlotCoord')),
 		isWinner: _checkForWinner(state),
