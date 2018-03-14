@@ -2,9 +2,15 @@ import { List } from 'immutable';
 import { ImmutableMap } from './ImmutableMap';
 
 export declare type Board = List<List<number>>;
-export declare type Card = List<List<number>>;
+export declare type SwapCard = List<List<number>>;
 export declare type Coords = List<ImmutableMap<string|number|any>>;
 export declare type Coord = ImmutableMap<string|number|any>;
+
+export interface Card {
+	school: string;
+	schoolColor: number;
+	card: Board;
+}
 
 export interface ApplicationState {
 	board?: Board;

@@ -6,16 +6,16 @@ import BoardSlot from './components/BoardSlot';
 import CardSlot from './components/CardSlot';
 import Debugger from './components/Debugger';
 import CapturedPieces from './components/CapturedPieces';
-import { Board, Card } from './typings';
+import { Board } from './typings';
 
 interface OnitamaProps extends React.Props<Onitama> {
 	actions: any;
 	board: Board;
-	swapCard: Card;
-	blueMoveCard1: Card;
-	blueMoveCard2: Card;
-	redMoveCard1: Card;
-	redMoveCard2: Card;
+	swapCard: any;
+	blueMoveCard1: any;
+	blueMoveCard2: any;
+	redMoveCard1: any;
+	redMoveCard2: any;
 	activePlayer: number;
 	isChoosingMoveCard: boolean;
 }
@@ -58,16 +58,26 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 	}
 
 	render() {
+		const {
+			blueMoveCard1,
+			blueMoveCard2,
+			board,
+			redMoveCard1,
+			redMoveCard2,
+			swapCard
+		} = this.props;
 		return (
 			<div>
 				<div className='cards'>
-					<div className='card' data-card={c.RED_MOVE_CARD_1} onClick={this.handleMoveCardClick}>
-						{this.props.redMoveCard1.map((col: any, x) => (
-							<div className='col' key={x}>{col.map((slot: any, y: number) => (<CardSlot key={y} value={slot} />))}</div>
-						))}
+					<div className={`card card--${true}`} data-card={c.RED_MOVE_CARD_1} onClick={this.handleMoveCardClick}>
+						{redMoveCard1.get('card').map((col: any, x: any) => {
+							return (
+								<div className='col' key={x}>{col.map((slot: any, y: number) => (<CardSlot key={y} value={slot} />))}</div>
+							);
+						})}
 					</div>
 					<div className='card' data-card={c.RED_MOVE_CARD_2} onClick={this.handleMoveCardClick}>
-						{this.props.redMoveCard2.map((col: any, x) => (
+						{redMoveCard2.get('card').map((col: any, x: any) => (
 							<div className='col' key={x}>{col.map((slot: any, y: number) => (<CardSlot key={y} value={slot} />))}</div>
 						))}
 					</div>
@@ -75,7 +85,7 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 
 				<div className='cards'>
 					<div className='card board'>
-						{this.props.board.map((col: any, x) => (
+						{board.map((col: any, x: any) => (
 							<div className='col' key={x}>
 								{col.map((slot: any, y: number) => (
 									<BoardSlot
@@ -89,7 +99,7 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 						))}
 					</div>
 					<div className='card' data-card='swapCard'>
-						{this.props.swapCard.map((col: any, x) => (
+						{swapCard.get('card').map((col: any, x: any) => (
 							<div className='col' key={x}>{col.map((slot: any, y: number) => (<CardSlot key={y} value={slot} />))}</div>
 						))}
 					</div>
@@ -97,12 +107,12 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 
 				<div className='cards'>
 					<div className='card' data-card={c.BLUE_MOVE_CARD_1} onClick={this.handleMoveCardClick}>
-						{this.props.blueMoveCard1.map((col: any, x) => (
+						{blueMoveCard1.get('card').map((col: any, x: any) => (
 							<div className='col' key={x}>{col.map((slot: any, y: number) => (<CardSlot key={y} value={slot} />))}</div>
 						))}
 					</div>
 					<div className='card blueMoveCard2' data-card={c.BLUE_MOVE_CARD_2} onClick={this.handleMoveCardClick}>
-						{this.props.blueMoveCard2.map((col: any, x) => (
+						{blueMoveCard2.get('card').map((col: any, x: any) => (
 							<div className='col' key={x}>{col.map((slot: any, y: number) => (<CardSlot key={y} value={slot} />))}</div>
 						))}
 					</div>

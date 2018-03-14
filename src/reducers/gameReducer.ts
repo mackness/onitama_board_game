@@ -49,20 +49,20 @@ export const DEFAULT_STATE = Map({
 const _getMoveCards = (state: any) => {
 	let isBlueActive = state.get('activePlayer') === c.BLUE;
 	return List([
-		state.get(isBlueActive ? 'blueMoveCard1' : 'redMoveCard1'),
-		state.get(isBlueActive ? 'blueMoveCard2' : 'redMoveCard2')
+		state.getIn([isBlueActive ? 'blueMoveCard1' : 'redMoveCard1', 'card']),
+		state.getIn([isBlueActive ? 'blueMoveCard2' : 'redMoveCard2', 'card'])
 	]);
 };
 
 const getInitialGameState = (state: any) => {
 	const shuffledCards = fromJS(shuffle(cards));
 	const nextState = Map({
-		swapCard: shuffledCards.getIn([0, 'card']),
-		blueMoveCard1: shuffledCards.getIn([1, 'card']),
-		blueMoveCard2: shuffledCards.getIn([2, 'card']),
-		redMoveCard1: shuffledCards.getIn([3, 'card']),
-		redMoveCard2: shuffledCards.getIn([4, 'card']),
-		activePlayer: shuffledCards.getIn([0, 'color'])
+		swapCard: shuffledCards.get(0),
+		blueMoveCard1: shuffledCards.get(1),
+		blueMoveCard2: shuffledCards.get(2),
+		redMoveCard1: shuffledCards.get(3),
+		redMoveCard2: shuffledCards.get(4),
+		activePlayer: shuffledCards.getIn([0, 'player'])
 	});
 
 	return state.merge(nextState);
@@ -137,6 +137,12 @@ const _getNextMoveHistory = (state: any, coord: Coord) => {
 };
 
 const _checkForWinner = (state: any) => {
+	const blueMaster = state.get('board').find((piece: any) => piece === c.BLUE_MASTER);
+	const redMaster = state.get('board').find((piece: any) => piece === c.RED_MASTER);
+
+	if (!blueMaster || !redMaster) {
+		return true;
+	}
 	return false;
 };
 

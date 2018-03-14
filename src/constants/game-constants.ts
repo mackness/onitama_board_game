@@ -15,13 +15,18 @@ export default {
 		x: null,
 		y: null
 	}),
-	DEFAULT_CARD: fromJS([
-		[0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0]
-	]),
+	DEFAULT_CARD: fromJS({
+		school: '',
+		cardColor: '',
+		player: '',
+		card: [
+			[0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0]
+		]
+	}),
 	BLUE_MOVE_CARD_1: 'blueMoveCard1',
 	BLUE_MOVE_CARD_2: 'blueMoveCard2',
 	RED_MOVE_CARD_1: 'redMoveCard1',

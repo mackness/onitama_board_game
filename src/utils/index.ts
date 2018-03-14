@@ -1,6 +1,6 @@
 import { Map } from 'immutable';
 import c from '../constants/game-constants';
-import { Board, Card, Coord } from '../typings';
+import { Board, SwapCard, Coord } from '../typings';
 
 /**
  * Gets the value of a given slot.
@@ -15,7 +15,7 @@ export function getSlotValue(board: Board, coord: any)  {
  * Get the absolute coords for all possible moves on a move card.
  * @param {List} card - a 5x5 matrix representing a move card.
  */
-export function getAbsoluteCoords(card: Card) {
+export function getAbsoluteCoords(card: SwapCard) {
 	let absCoords = [];
 	for (var x = 0; x < card.size; x++) {
 		for (var y = 0; y < card.get(x).size; y++) {
