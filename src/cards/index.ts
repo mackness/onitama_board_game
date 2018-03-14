@@ -3,7 +3,7 @@ import c from '../constants/game-constants';
 export default [
 	{
 		school: 'mantis',
-		cardColor: c.RED,
+		color: 'blue',
 		player: c.RED,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -15,7 +15,7 @@ export default [
 	},
 	{
 		school: 'ox',
-		cardColor: c.RED,
+		color: 'blue',
 		player: c.RED,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -27,7 +27,7 @@ export default [
 	},
 	{
 		school: 'cobra',
-		cardColor: c.RED,
+		color: 'green',
 		player: c.RED,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -39,7 +39,7 @@ export default [
 	},
 	{
 		school: 'horse',
-		cardColor: c.RED,
+		color: 'green',
 		player: c.RED,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -51,7 +51,7 @@ export default [
 	},
 	{
 		school: 'eel',
-		cardColor: c.RED,
+		color: 'red',
 		player: c.RED,
 		card: [
 			[0, 0, 0, 0, 0],

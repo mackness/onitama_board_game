@@ -3,16 +3,17 @@ import c from '../../constants/game-constants';
 
 interface CardSlotProps {
 	value: number;
+	color?: string;
 }
 
-const CardSlot: React.StatelessComponent<CardSlotProps> = ({value}) => {
+const CardSlot: React.StatelessComponent<CardSlotProps> = ({value, color}) => {
 	switch (value) {
-		case c.RED:
-			return <div className='slot red'>{value}</div>;
-		case c.BLUE:
-			return <div className='slot blue'>{value}</div>;
+		case c.MOVE:
+			return <div className={`slot slot--${color}`} />;
+		case c.START:
+			return <div className='slot slot--start' />;
 		default:
-			return <div className='slot'>{value}</div>;
+			return <div className='slot' />;
 	}
 };
 
