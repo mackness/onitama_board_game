@@ -14,6 +14,10 @@ body {
 
 .board {
 	margin-right: 10px;
+	overflow: hidden;
+	border: solid 1px #000;
+	display: flex;
+	justify-content: space-around;
 }
 
 .cards {
@@ -28,6 +32,7 @@ body {
 	border: solid 1px #000;
 	display: flex;
 	justify-content: space-around;
+	height: 154px;
 }
 
 .card:first-child {

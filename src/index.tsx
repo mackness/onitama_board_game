@@ -5,7 +5,7 @@ import configureStore from './store/configureStore';
 import Onitama from './Onitama';
 import registerServiceWorker from './registerServiceWorker';
 import Actions from './actions';
-import './styles/styles.css';
+import './styles/base.css';
 
 const store = configureStore({});
 const actions = new Actions(store);

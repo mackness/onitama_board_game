@@ -35,7 +35,7 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 		this.props.actions.gameActions.setupInitialGameState();
 	}
 
-	handleMoveCardClick = (event: any): void => {
+	_handleMoveCardClick = (event: any): void => {
 		let card = event.currentTarget.dataset.card;
 		if (this.props.isChoosingMoveCard) {
 			switch (card) {
@@ -57,6 +57,22 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 		}
 	}
 
+	_renderCard = (card: any, id: string) => {
+		return (
+			<div className='card' data-card={id} onClick={this._handleMoveCardClick}>
+				{card.get('card').map((col: any, x: any) => (
+					<div className='col' key={x}>{col.map((slot: any, y: number) => (
+						<CardSlot
+							color={card.get('color')}
+							key={y}
+							value={slot}
+						/>
+					))}</div>
+				))}
+			</div>
+		);
+	}
+
 	render() {
 		const {
 			blueMoveCard1,
@@ -69,32 +85,12 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 		return (
 			<div>
 				<div className='cards'>
-					<div className='card' data-card={c.RED_MOVE_CARD_1} onClick={this.handleMoveCardClick}>
-						{redMoveCard1.get('card').map((col: any, x: any) => (
-							<div className='col' key={x}>{col.map((slot: any, y: number) => (
-								<CardSlot
-									color={redMoveCard1.get('color')}
-									key={y}
-									value={slot}
-								/>
-							))}</div>
-						))}
-					</div>
-					<div className='card' data-card={c.RED_MOVE_CARD_2} onClick={this.handleMoveCardClick}>
-						{redMoveCard2.get('card').map((col: any, x: any) => (
-							<div className='col' key={x}>{col.map((slot: any, y: number) => (
-								<CardSlot
-									color={redMoveCard2.get('color')}
-									key={y}
-									value={slot}
-								/>
-							))}</div>
-						))}
-					</div>
+					{this._renderCard(redMoveCard1, c.RED_MOVE_CARD_1)}
+					{this._renderCard(redMoveCard2, c.RED_MOVE_CARD_2)}
 				</div>
 
 				<div className='cards'>
-					<div className='card board'>
+					<div className='board'>
 						{board.map((col: any, x: any) => (
 							<div className='col' key={x}>
 								{col.map((slot: any, y: number) => (
@@ -108,42 +104,12 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 							</div>
 						))}
 					</div>
-					<div className='card' data-card='swapCard'>
-						{swapCard.get('card').map((col: any, x: any) => (
-							<div className='col' key={x}>{col.map((slot: any, y: number) => (
-								<CardSlot
-									color={swapCard.get('color')}
-									key={y}
-									value={slot}
-								/>
-							))}</div>
-						))}
-					</div>
-				</div>
+					{this._renderCard(swapCard, c.SWAP_CARD)}
 
+				</div>
 				<div className='cards'>
-					<div className='card' data-card={c.BLUE_MOVE_CARD_1} onClick={this.handleMoveCardClick}>
-						{blueMoveCard1.get('card').map((col: any, x: any) => (
-							<div className='col' key={x}>{col.map((slot: any, y: number) => (
-								<CardSlot
-									color={blueMoveCard1.get('color')}
-									key={y}
-									value={slot}
-								/>
-							))}</div>
-						))}
-					</div>
-					<div className='card' data-card={c.BLUE_MOVE_CARD_2} onClick={this.handleMoveCardClick}>
-						{blueMoveCard2.get('card').map((col: any, x: any) => (
-							<div className='col' key={x}>{col.map((slot: any, y: number) => (
-								<CardSlot
-									color={blueMoveCard2.get('color')}
-									key={y}
-									value={slot}
-								/>
-							))}</div>
-						))}
-					</div>
+					{this._renderCard(blueMoveCard1, c.BLUE_MOVE_CARD_1)}
+					{this._renderCard(blueMoveCard2, c.BLUE_MOVE_CARD_2)}
 				</div>
 				<CapturedPieces />
 				<Debugger state={this.props} />
