@@ -8,7 +8,9 @@ import {
 	SLOT_INTERACTION,
 	PERFORM_MOVE,
 	MOVE_CARD_EXCHANGE,
-	AUTO_MOVE_CARD_EXCHANGE
+	AUTO_MOVE_CARD_EXCHANGE,
+	CHECK_FOR_WINNER,
+	RESET_GAME
 } from '../constants/action-constants';
 
 import {
@@ -43,6 +45,7 @@ export const DEFAULT_STATE = Map({
 	candidateCoords: List(),
 	activePlayer: null,
 	moveHistory: List(),
+	winner: null,
 	isChoosingMoveCard: false
 });
 
@@ -57,6 +60,18 @@ const _getMoveCards = (state: any) => {
 const getInitialGameState = (state: any) => {
 	const shuffledCards = fromJS(shuffle(cards));
 	const nextState = Map({
+		winner: null,
+		board: fromJS([
+			[c.RED, 0, 0, 0, c.BLUE],
+			[c.RED, 0, 0, 0, c.BLUE],
+			[c.RED_MASTER, 0, 0, 0, c.BLUE_MASTER],
+			[c.RED, 0, 0, 0, c.BLUE],
+			[c.RED, 0, 0, 0, c.BLUE]
+		]),
+		capturedPieces: Map({
+			red: List([0, 0, 0, 0, 0]),
+			blue: List([0, 0, 0, 0, 0])
+		}),
 		swapCard: shuffledCards.get(0),
 		blueMoveCard1: shuffledCards.get(1),
 		blueMoveCard2: shuffledCards.get(2),
@@ -136,14 +151,28 @@ const _getNextMoveHistory = (state: any, coord: Coord) => {
 	});
 };
 
-const _checkForWinner = (state: any) => {
-	const blueMaster = state.get('board').find((piece: any) => piece === c.BLUE_MASTER);
-	const redMaster = state.get('board').find((piece: any) => piece === c.RED_MASTER);
+const _hasMaster = (board: any, piece: any) => {
+	let hasMaster = false;
 
-	if (!blueMaster || !redMaster) {
-		return true;
+	for (var x = 0; x < board.size; x++) {
+		for (var y = 0; y < board.size; y++) {
+			if (board.getIn([x, y]) === piece) {
+				hasMaster = true;
+			}
+		}
 	}
-	return false;
+
+	return hasMaster;
+};
+
+const checkForWinner = (state: any) => {
+	const redWinner = !_hasMaster(state.get('board'), c.BLUE_MASTER);
+	const blueWinner = !_hasMaster(state.get('board'), c.RED_MASTER);
+	if (blueWinner || redWinner) {
+		return state.set('winner', blueWinner ? c.BLUE : c.RED);
+	}
+
+	return state.set('winner', null);
 };
 
 const performMove = (state: any, payload: any) => {
@@ -152,7 +181,6 @@ const performMove = (state: any, payload: any) => {
 		capturedPieces: _getNextCapturedPieces(state, payload.coord),
 		moveHistory: _getNextMoveHistory(state, payload.coord),
 		lastMoveRelativeCoords: getRelativeCoord(payload.coord, state.get('activeSlotCoord')),
-		isWinner: _checkForWinner(state),
 		activeSlotCoord: c.EMPTY_COORD,
 		candidateCoords: List()
 	});
@@ -221,6 +249,10 @@ const moveCardExchange = (state: any, moveCard: string) => {
 	return state.merge(_swapMoveCard(state, moveCard));
 };
 
+const resetGame = (state: any) => {
+	return state.merge(getInitialGameState(state));
+};
+
 const gameReducer = (state = DEFAULT_STATE, action: any) => {
 	switch (action.type) {
 		case INITIAL_GAME_STATE:
@@ -233,6 +265,10 @@ const gameReducer = (state = DEFAULT_STATE, action: any) => {
 			return autoMoveCardExchange(state);
 		case MOVE_CARD_EXCHANGE:
 			return moveCardExchange(state, action.payload.moveCard);
+		case CHECK_FOR_WINNER:
+			return checkForWinner(state);
+		case RESET_GAME:
+			return resetGame(state);
 		default:
 			return state;
 	}

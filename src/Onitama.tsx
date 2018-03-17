@@ -1,11 +1,14 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Map } from 'immutable';
+import styled from 'styled-components';
 import c from './constants/game-constants';
 import BoardSlot from './components/BoardSlot';
 import CardSlot from './components/CardSlot';
-import Debugger from './components/Debugger';
 import CapturedPieces from './components/CapturedPieces';
+import WinnerPanel from './components/WinnerPanel';
+import ActivePlayerPanel from './components/ActivePlayerPanel';
+import Piece from './components/Piece';
 import { Board } from './typings';
 
 interface OnitamaProps extends React.Props<Onitama> {
@@ -23,6 +26,16 @@ interface OnitamaProps extends React.Props<Onitama> {
 interface OnitamaState {
 
 }
+
+const CardMetaRow = styled.div`
+	display: flex;
+	align-items: center;
+	padding-right: 5px;
+`;
+
+const Label = styled.span`
+	flex-grow: 1;
+`;
 
 class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 
@@ -59,16 +72,22 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 
 	_renderCard = (card: any, id: string) => {
 		return (
-			<div className='card' data-card={id} onClick={this._handleMoveCardClick}>
-				{card.get('card').map((col: any, x: any) => (
-					<div className='col' key={x}>{col.map((slot: any, y: number) => (
-						<CardSlot
-							color={card.get('color')}
-							key={y}
-							value={slot}
-						/>
-					))}</div>
-				))}
+			<div className='card'>
+				<div className='card-grid' data-card={id} onClick={this._handleMoveCardClick}>
+					{card.get('card').map((col: any, x: any) => (
+						<div className='col' key={x}>{col.map((slot: any, y: number) => (
+							<CardSlot
+								color={card.get('color')}
+								key={y}
+								value={slot}
+							/>
+						))}</div>
+					))}
+				</div>
+				<CardMetaRow>
+					<Label className='card-label'>{card.get('school')}</Label>
+					<Piece color={card.get('player')} size='small' />
+				</CardMetaRow>
 			</div>
 		);
 	}
@@ -111,8 +130,9 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 					{this._renderCard(blueMoveCard1, c.BLUE_MOVE_CARD_1)}
 					{this._renderCard(blueMoveCard2, c.BLUE_MOVE_CARD_2)}
 				</div>
+				<ActivePlayerPanel />
 				<CapturedPieces />
-				<Debugger state={this.props} />
+				<WinnerPanel actions={this.props.actions} />
 			</div>
 		);
 	}

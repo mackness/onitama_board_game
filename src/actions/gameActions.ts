@@ -6,7 +6,9 @@ import {
 	SLOT_INTERACTION,
 	PERFORM_MOVE,
 	MOVE_CARD_EXCHANGE,
-	AUTO_MOVE_CARD_EXCHANGE
+	AUTO_MOVE_CARD_EXCHANGE,
+	CHECK_FOR_WINNER,
+	RESET_GAME
 } from '../constants/action-constants';
 
 export default class GameActions {
@@ -34,6 +36,9 @@ export default class GameActions {
 			type: PERFORM_MOVE,
 			payload: { coord }
 		});
+		this.store.dispatch({
+			type: CHECK_FOR_WINNER
+		});
 	}
 
 	handleMoveCardExchange(moveCard: any) {
@@ -47,5 +52,9 @@ export default class GameActions {
 				type: AUTO_MOVE_CARD_EXCHANGE
 			});
 		}
+	}
+
+	resetGame() {
+		this.store.dispatch({type: RESET_GAME});
 	}
 }

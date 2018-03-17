@@ -13,7 +13,7 @@ body {
 }
 
 .board {
-	margin-right: 10px;
+	margin-right: 20px;
 	overflow: hidden;
 	border: solid 1px #000;
 	display: flex;
@@ -23,16 +23,31 @@ body {
 .cards {
 	width: 425px;
 	display: flex;
-	margin-top: 15px;
-	margin-bottom: 15px;
+	margin-top: 20px;
+	margin-bottom: 20px;
 }
 
 .card {
+	margin: auto 0;
+	background-color: #000;
+	border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
+}
+
+.card-grid {
 	overflow: hidden;
 	border: solid 1px #000;
 	display: flex;
 	justify-content: space-around;
 	height: 154px;
+	background-color: #fff;
+}
+
+.card-label {
+    display: block;
+    color: #fff;
+    padding: 5px 7px;
+    font-size: 14px;
 }
 
 .card:first-child {
