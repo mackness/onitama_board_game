@@ -67,8 +67,6 @@ export default class GameActions {
 			}
 		});
 
-		this.performComputerMove();
-
 		this.store.dispatch({
 			type: CHECK_FOR_WINNER
 		});

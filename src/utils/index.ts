@@ -108,7 +108,8 @@ export function getCandidateCoords(state: any, acoord: any) {
 	const moveCard2RelativeCoords = getRelativeCoordsByMoveCard(moveCards.get(1));
 	const moveCardCoords = moveCard1RelativeCoords.concat(moveCard2RelativeCoords);
 
-	// generate a list of possible moves and filter out of bounds moves
+	// generate a list of possible moves and filter out of bounds moves and moves that
+	// target active palyers slot
 	return moveCardCoords.map((coord: any) => {
 		return Map({
 			x: acoord.get('x') + coord.get('x'),
@@ -117,7 +118,9 @@ export function getCandidateCoords(state: any, acoord: any) {
 	}).filter((coord: any) => {
 		return (
 			(coord.get('x') >= 0 && coord.get('x') <= 4) &&
-			(coord.get('y') >= 0 && coord.get('y') <= 4)
+			(coord.get('y') >= 0 && coord.get('y') <= 4) &&
+			(isOpponentSlot(state.get('activePlayer'), state.get('board'), coord) ||
+			getSlotValue(state.get('board'), coord) === c.EMPTY)
 		);
 	});
 }
