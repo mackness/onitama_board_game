@@ -81,7 +81,8 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 								key={y}
 								value={slot}
 							/>
-						))}</div>
+						))}
+						</div>
 					))}
 				</div>
 				<CardMetaRow>

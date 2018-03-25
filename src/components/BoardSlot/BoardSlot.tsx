@@ -76,10 +76,12 @@ class BoardSlot extends React.Component<BoardSlotProps, BoardSlotState> {
 	}
 
 	_handleSlotClick = (event: any) => {
-		let { activePlayer, board, slotCoord } = this.props;
-		if (event.currentTarget.classList.contains('candidate') &&
-		getSlotValue(board, slotCoord) !== activePlayer) {
-			this.props.actions.gameActions.handleCandidateSlotInteraction(slotCoord);
+		let { activePlayer, board, slotCoord, activeSlotCoord } = this.props;
+		if (event.currentTarget.classList.contains('candidate') && getSlotValue(board, slotCoord) !== activePlayer) {
+			this.props.actions.gameActions.handleCandidateSlotInteraction({
+				srcCoord: activeSlotCoord,
+				targetCoord: slotCoord
+			});
 			this.props.actions.gameActions.handleMoveCardExchange();
 		} else {
 			this.props.actions.gameActions.handleSlotInteraction(slotCoord);

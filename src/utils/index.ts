@@ -1,6 +1,6 @@
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 import c from '../constants/game-constants';
-import { Board, SwapCard, Coord } from '../typings';
+import { Board, Coord } from '../typings';
 
 /**
  * Gets the value of a given slot.
@@ -13,9 +13,10 @@ export function getSlotValue(board: Board, coord: any)  {
 
 /**
  * Get the absolute coords for all possible moves on a move card.
+ * note: the absolute coordinate list will only contain in bounds coordinates
  * @param {List} card - a 5x5 matrix representing a move card.
  */
-export function getAbsoluteCoords(card: SwapCard) {
+export function getAbsoluteCoords(card: any) {
 	let absCoords = [];
 	for (var x = 0; x < card.size; x++) {
 		for (var y = 0; y < card.get(x).size; y++) {
@@ -74,11 +75,60 @@ export function toggleActivePlayer(activePlayer: number) {
 }
 
 /**
+ * Gets the move cards for the currently active player.
+ * @param {Number} state application state.
+ * @return {List} list of move cards.
+ */
+export function getMoveCards(state: any) {
+	let isBlueActive = state.get('activePlayer') === c.BLUE;
+	return List([
+		state.getIn([isBlueActive ? 'blueMoveCard1' : 'redMoveCard1', 'card']),
+		state.getIn([isBlueActive ? 'blueMoveCard2' : 'redMoveCard2', 'card'])
+	]);
+}
+
+/**
+ * Gets the relative coords of a given move card.
+ * @param {Number} state application state.
+ * @return {Array} array of possible moves
+ */
+export function getRelativeCoordsByMoveCard(moveCard: any) {
+	return getRelativeCoords(c.CENTER, getAbsoluteCoords(moveCard));
+}
+
+/**
+ * Gets the possible moves for a given slot.
+ * @param {Number} state application state.
+ * @param {Map} acoord coordinate map for a slot.
+ * @return {Array} array of possible moves
+ */
+export function getCandidateCoords(state: any, acoord: any) {
+	const moveCards = getMoveCards(state);
+	const moveCard1RelativeCoords = getRelativeCoordsByMoveCard(moveCards.get(0));
+	const moveCard2RelativeCoords = getRelativeCoordsByMoveCard(moveCards.get(1));
+	const moveCardCoords = moveCard1RelativeCoords.concat(moveCard2RelativeCoords);
+
+	// generate a list of possible moves and filter out of bounds moves
+	return moveCardCoords.map((coord: any) => {
+		return Map({
+			x: acoord.get('x') + coord.get('x'),
+			y: acoord.get('y') + coord.get('y')
+		});
+	}).filter((coord: any) => {
+		return (
+			(coord.get('x') >= 0 && coord.get('x') <= 4) &&
+			(coord.get('y') >= 0 && coord.get('y') <= 4)
+		);
+	});
+}
+
+/**
  * searches a card for relative coords.
- * note: this function is used to determine if the coordiates of the last move match
- * the relative coords of one of the move cards.
- * @param {Map} a coord pair
- * @param {List} card
+ * note: this function is used to determine if the relative coordiates of the last move match
+ * the relative coords of one of the move cards. It is used to attempt and auotmatic
+ * move card exchange.
+ * @param {Map} moveCoords a relative coord pair for a move
+ * @param {List} cardCoords the relative move coords for a given move card
  * @return {Map} relative coord
  */
 export function relativeCoordSearch(moveCoords: Coord, cardCoords: any) {
@@ -109,4 +159,15 @@ export function isOpponentSlot(activePlayer: number, board: any, coord: any): bo
 	} else {
 		return slotValue <= c.BLUE_MASTER && slotValue > c.RED_MASTER;
 	}
+}
+
+/**
+ * generates a random int in a range.
+ * note: min inclusive max exclusive
+ * @param {number} min min value in range
+ * @param {number} max max value in range
+ * @return {number} random int
+ */
+export function getRandomInt(min: number, max: number): number {
+	return Math.floor(Math.random() * (max - min) + min);
 }
