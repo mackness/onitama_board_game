@@ -1,5 +1,4 @@
 import { getSlotValue } from '../utils';
-
 import c from '../constants/game-constants';
 import {
 	INITIAL_GAME_STATE,
@@ -10,10 +9,12 @@ import {
 	CHECK_FOR_WINNER,
 	RESET_GAME
 } from '../constants/action-constants';
-import Minimax from '../minimax';
+import Ai from '../ai';
 
 export default class GameActions {
 	store: any;
+	ai: any;
+
 	constructor(store: any) {
 		this.store = store;
 	}
@@ -29,8 +30,9 @@ export default class GameActions {
 		if (state.get('activePlayer') === c.RED &&
 			state.get('mode') === c.MODE_COMPUTER) {
 
-			const minimax = new Minimax(this.store);
-			const move = minimax.makeBlindMove();
+			const ai = new Ai(this.store);
+			const move = ai.makeBlindMove();
+
 			this.store.dispatch({
 				type: PERFORM_MOVE,
 				payload: {
@@ -52,8 +54,8 @@ export default class GameActions {
 	}
 
 	performComputerMove() {
-		const minimax = new Minimax(this.store);
-		const move = minimax.makeBlindMove();
+		const ai = new Ai(this.store);
+		const move = ai.makeBlindMove();
 		this.store.dispatch({
 			type: PERFORM_MOVE,
 			payload: {

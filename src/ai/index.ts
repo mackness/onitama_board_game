@@ -1,4 +1,4 @@
-import { Map, fromJS } from 'immutable';
+import { fromJS } from 'immutable';
 import c from '../constants/game-constants';
 import Actions from '../actions';
 import {
@@ -7,10 +7,11 @@ import {
 	getRelativeCoord,
 	getMoveCards,
 	getRelativeCoordsByMoveCard,
-	relativeCoordSearch
+	relativeCoordSearch,
+	getSourceCoords
 } from '../utils';
 
-export default class Minimax {
+export default class Ai {
 	store: any;
 	state: any;
 	actions: any;
@@ -21,13 +22,20 @@ export default class Minimax {
 		this.actions = new Actions(this.store);
 	}
 
+	/**
+	 * This method chooses a source coord, target coord and a move card at random in 
+	 * order to construct a move.
+	 * @return {Map} a map of all the data necessary to make a move.
+	 */	
 	public makeBlindMove = () => {
+		const board = this.state.get('board');
+		const player = this.state.get('activePlayer');
 
-		const srcCoord = Map({
-			x: getRandomInt(0, 4),
-			y: 0
-		});
+		// get source coord
+		const srcCoords = getSourceCoords(board, player);
+		const srcCoord = srcCoords[getRandomInt(0, srcCoords.length)];
 
+		// get target coord
 		const candidateCoords = getCandidateCoords(this.state, srcCoord);
 		const targetCoord = candidateCoords[getRandomInt(0, candidateCoords.length)];
 

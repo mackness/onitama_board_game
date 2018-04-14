@@ -29,6 +29,22 @@ export function getAbsoluteCoords(card: any) {
 }
 
 /**
+ * Get the coords of active board pieces for a given player in order to make a move.
+ * @return {List} a list of coordinates of all active board pieces.
+ */	
+export function getSourceCoords(board: any, player: any) {
+	let sourceCoords = [];
+	for (var x = 0; x < board.size; x++) {
+		for (var y = 0; y < board.get(x).size; y++) {
+			if (board.getIn([x, y]) === player) {
+				sourceCoords.push(Map({x, y}));
+			}
+		}
+	}
+	return sourceCoords;
+}
+
+/**
  * Get the distance from point a to point b as an x, y coordinate pair.
  * @param {Map} a - the start coordinate.
  * @param {Map} b - the end coordinate.
@@ -108,8 +124,8 @@ export function getCandidateCoords(state: any, acoord: any) {
 	const moveCard2RelativeCoords = getRelativeCoordsByMoveCard(moveCards.get(1));
 	const moveCardCoords = moveCard1RelativeCoords.concat(moveCard2RelativeCoords);
 
-	// generate a list of possible moves and filter out of bounds moves and moves that
-	// target active palyers slot
+	// generate a list of possible moves - exclude moves that target active player's slots
+	// and out of bounds moves
 	return moveCardCoords.map((coord: any) => {
 		return Map({
 			x: acoord.get('x') + coord.get('x'),
