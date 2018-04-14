@@ -82,7 +82,6 @@ class BoardSlot extends React.Component<BoardSlotProps, BoardSlotState> {
 				srcCoord: activeSlotCoord,
 				targetCoord: slotCoord
 			});
-			this.props.actions.gameActions.handleMoveCardExchange();
 		} else {
 			this.props.actions.gameActions.handleSlotInteraction(slotCoord);
 		}

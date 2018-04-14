@@ -32,8 +32,6 @@ export default {
 	RED_MOVE_CARD_1: 'redMoveCard1',
 	RED_MOVE_CARD_2: 'redMoveCard2',
 	SWAP_CARD: 'swapCard',
-	MODE: {
-		COMPUTER: 'computer',
-		HUMAN: 'human'
-	}
+	MODE_HUMAN: 'human',
+	MODE_COMPUTER: 'computer'
 };

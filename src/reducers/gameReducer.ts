@@ -48,10 +48,10 @@ export const DEFAULT_STATE = Map({
 	moveHistory: List(),
 	winner: null,
 	isChoosingMoveCard: false,
-	mode: 'computer'
+	mode: c.MODE_HUMAN
 });
 
-const getInitialGameState = (state: any) => {
+const getInitialGameState = (state: any, payload?: any) => {
 	const shuffledCards = fromJS(shuffle(cards));
 	const nextState = Map({
 		winner: null,
@@ -71,7 +71,8 @@ const getInitialGameState = (state: any) => {
 		blueMoveCard2: shuffledCards.get(2),
 		redMoveCard1: shuffledCards.get(3),
 		redMoveCard2: shuffledCards.get(4),
-		activePlayer: shuffledCards.getIn([0, 'player'])
+		activePlayer: shuffledCards.getIn([0, 'player']),
+		mode: (payload && payload.mode === c.MODE_HUMAN) ? c.MODE_HUMAN : c.MODE_COMPUTER
 	});
 
 	return state.merge(nextState);
@@ -244,7 +245,7 @@ const resetGame = (state: any) => {
 const gameReducer = (state = DEFAULT_STATE, action: any) => {
 	switch (action.type) {
 		case INITIAL_GAME_STATE:
-			return getInitialGameState(state);
+			return getInitialGameState(state, action.payload);
 		case SLOT_INTERACTION:
 			return handleSlotInteraction(state, action.payload);
 		case PERFORM_MOVE:

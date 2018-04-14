@@ -18,11 +18,17 @@ export default class GameActions {
 		this.store = store;
 	}
 
-	setupInitialGameState() {
-		this.store.dispatch({type: INITIAL_GAME_STATE});
+	setupInitialGameState(mode: string) {
+		const state = this.store.getState().game;
 
-		if (this.store.getState().game.get('activePlayer') === c.RED &&
-			this.store.getState().game.get('mode') === c.MODE.COMPUTER) {
+		this.store.dispatch({
+			type: INITIAL_GAME_STATE,
+			payload: { mode }
+		});
+
+		if (state.get('activePlayer') === c.RED &&
+			state.get('mode') === c.MODE_COMPUTER) {
+
 			const minimax = new Minimax(this.store);
 			const move = minimax.makeBlindMove();
 			this.store.dispatch({
@@ -57,22 +63,36 @@ export default class GameActions {
 		});
 	}
 
-	handleCandidateSlotInteraction(coords: any) {
+	performPlayerMove(coords: any) {
+		return new Promise((resolve, reject) => {
+			this.store.dispatch({
+				type: PERFORM_MOVE,
+				payload: {
+					srcCoord: coords.srcCoord,
+					targetCoord: coords.targetCoord
+				}
+			});
+			resolve();
+		});
+	}
 
-		this.store.dispatch({
-			type: PERFORM_MOVE,
-			payload: {
-				srcCoord: coords.srcCoord,
-				targetCoord: coords.targetCoord
+	handleCandidateSlotInteraction(coords: any) {
+		const state = this.store.getState().game;
+
+		this.performPlayerMove(coords).then(() => {
+			if (state.get('mode') === c.MODE_COMPUTER) {
+				this.performComputerMove();
 			}
 		});
+
+		this.handleMoveCardExchange();
 
 		this.store.dispatch({
 			type: CHECK_FOR_WINNER
 		});
 	}
 
-	handleMoveCardExchange(moveCard: any) {
+	handleMoveCardExchange(moveCard?: any) {
 		if (moveCard) {
 			this.store.dispatch({
 				type: MOVE_CARD_EXCHANGE,

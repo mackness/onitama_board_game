@@ -56,7 +56,7 @@ export default class Minimax {
 		} else if (moveCard2SearchResults) {
 			this.actions.gameActions.handleMoveCardExchange(c.RED_MOVE_CARD_2);
 		} else {
-			// throw new Error('noOP, both move card coords did not match last move coords');
+			throw new Error('noOP, both move card coords did not match last move coords');
 		}
 	}
 }
