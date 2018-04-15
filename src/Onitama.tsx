@@ -1,20 +1,19 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Map } from 'immutable';
-import styled from 'styled-components';
 import c from './constants/game-constants';
+import Card from './components/Card';
 import BoardSlot from './components/BoardSlot';
-import CardSlot from './components/CardSlot';
 import CapturedPieces from './components/CapturedPieces';
 import WinnerPanel from './components/WinnerPanel';
 import ActivePlayerPanel from './components/ActivePlayerPanel';
-import Piece from './components/Piece';
 import { Board } from './typings';
 
 interface OnitamaProps extends React.Props<Onitama> {
 	actions: any;
 	board: Board;
 	swapCard: any;
+	location: any;
 	blueMoveCard1: any;
 	blueMoveCard2: any;
 	redMoveCard1: any;
@@ -27,16 +26,6 @@ interface OnitamaState {
 
 }
 
-const CardMetaRow = styled.div`
-	display: flex;
-	align-items: center;
-	padding-right: 5px;
-`;
-
-const Label = styled.span`
-	flex-grow: 1;
-`;
-
 class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 
 	constructor(props: any) {
@@ -45,10 +34,11 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 	}
 
 	componentDidMount(): void {
-		this.props.actions.gameActions.setupInitialGameState();
+		const mode = this.props.location.state.mode;
+		this.props.actions.gameActions.setupInitialGameState(mode);
 	}
 
-	_handleMoveCardClick = (event: any): void => {
+	moveCardInteraction = (event: any): void => {
 		let card = event.currentTarget.dataset.card;
 		if (this.props.isChoosingMoveCard) {
 			switch (card) {
@@ -70,28 +60,6 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 		}
 	}
 
-	_renderCard = (card: any, id: string) => {
-		return (
-			<div className='card'>
-				<div className='card-grid' data-card={id} onClick={this._handleMoveCardClick}>
-					{card.get('card').map((col: any, x: any) => (
-						<div className='col' key={x}>{col.map((slot: any, y: number) => (
-							<CardSlot
-								color={card.get('color')}
-								key={y}
-								value={slot}
-							/>
-						))}</div>
-					))}
-				</div>
-				<CardMetaRow>
-					<Label className='card-label'>{card.get('school')}</Label>
-					<Piece color={card.get('player')} size='small' />
-				</CardMetaRow>
-			</div>
-		);
-	}
-
 	render() {
 		const {
 			blueMoveCard1,
@@ -104,10 +72,17 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 		return (
 			<div>
 				<div className='cards'>
-					{this._renderCard(redMoveCard1, c.RED_MOVE_CARD_1)}
-					{this._renderCard(redMoveCard2, c.RED_MOVE_CARD_2)}
+					<Card
+						card={redMoveCard1}
+						interaction={this.moveCardInteraction}
+						label={c.RED_MOVE_CARD_1}
+					/>
+					<Card
+						card={redMoveCard2}
+						interaction={this.moveCardInteraction}
+						label={c.RED_MOVE_CARD_2}
+					/>
 				</div>
-
 				<div className='cards'>
 					<div className='board'>
 						{board.map((col: any, x: any) => (
@@ -123,12 +98,23 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 							</div>
 						))}
 					</div>
-					{this._renderCard(swapCard, c.SWAP_CARD)}
-
+					<Card
+						card={swapCard}
+						interaction={this.moveCardInteraction}
+						label={c.SWAP_CARD}
+					/>
 				</div>
 				<div className='cards'>
-					{this._renderCard(blueMoveCard1, c.BLUE_MOVE_CARD_1)}
-					{this._renderCard(blueMoveCard2, c.BLUE_MOVE_CARD_2)}
+					<Card
+						card={blueMoveCard1}
+						interaction={this.moveCardInteraction}
+						label={c.BLUE_MOVE_CARD_1}
+					/>
+					<Card
+						card={blueMoveCard2}
+						interaction={this.moveCardInteraction}
+						label={c.BLUE_MOVE_CARD_2}
+					/>
 				</div>
 				<ActivePlayerPanel />
 				<CapturedPieces />
