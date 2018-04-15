@@ -23,8 +23,7 @@ export default class Ai {
 	}
 
 	/**
-	 * This method chooses a source coord, target coord and a move card at random in 
-	 * order to construct a move.
+	 * This method constructs a move by randomly selecting source and target move coords.
 	 * @return {Map} a map of all the data necessary to make a move.
 	 */	
 	public makeBlindMove = () => {

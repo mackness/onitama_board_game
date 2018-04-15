@@ -144,8 +144,7 @@ export function getCandidateCoords(state: any, acoord: any) {
 /**
  * searches a card for relative coords.
  * note: this function is used to determine if the relative coordiates of the last move match
- * the relative coords of one of the move cards. It is used to attempt and auotmatic
- * move card exchange.
+ * the relative coords of one of the move cards. It is used to attempt and auto move card exchange.
  * @param {Map} moveCoords a relative coord pair for a move
  * @param {List} cardCoords the relative move coords for a given move card
  * @return {Map} relative coord

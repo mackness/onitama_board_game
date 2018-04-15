@@ -4,6 +4,7 @@
 	"private": true,
 	"homepage": "https://mackness.github.io/onitama",
 	"dependencies": {
+		"axios": "^0.18.0",
 		"immutable": "^3.8.2",
 		"prop-types": "^15.6.1",
 		"react": "^16.2.0",

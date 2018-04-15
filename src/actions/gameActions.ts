@@ -19,28 +19,31 @@ export default class GameActions {
 		this.store = store;
 	}
 
-	setupInitialGameState(mode: string) {
-		const state = this.store.getState().game;
-
-		this.store.dispatch({
-			type: INITIAL_GAME_STATE,
-			payload: { mode }
+	initGame(mode: string) {
+		return new Promise((resolve, reject) => {
+			try {
+				this.store.dispatch({
+					type: INITIAL_GAME_STATE,
+					payload: { mode }
+				});
+				resolve(this.store.getState().game);
+			} catch (error) {
+				reject(error);
+			}
 		});
+	}
 
-		if (state.get('activePlayer') === c.RED &&
-			state.get('mode') === c.MODE_COMPUTER) {
-
-			const ai = new Ai(this.store);
-			const move = ai.makeBlindMove();
-
-			this.store.dispatch({
-				type: PERFORM_MOVE,
-				payload: {
-					srcCoord: move.getIn(['coords', 'src']),
-					targetCoord: move.getIn(['coords', 'target'])
+	setupInitialGameState(mode: string) {
+		this.initGame(mode)
+			.then((state: any) => {
+				if (state.get('activePlayer') === c.RED &&
+					state.get('mode') === c.MODE_COMPUTER) {
+					this.performComputerMove();
 				}
+			})
+			.catch((error) => {
+				// log initialization error
 			});
-		}
 	}
 
 	handleSlotInteraction(coord: any) {
@@ -82,7 +85,8 @@ export default class GameActions {
 		const state = this.store.getState().game;
 
 		this.performPlayerMove(coords).then(() => {
-			if (state.get('mode') === c.MODE_COMPUTER) {
+			if (!state.get('winner') &&
+				state.get('mode') === c.MODE_COMPUTER) {
 				this.performComputerMove();
 			}
 		});
