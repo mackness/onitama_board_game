@@ -1,8 +1,8 @@
 import { List, Map, fromJS } from 'immutable';
 import { Coord } from '../typings';
 import cards from '../cards';
-
 import c from '../constants/game-constants';
+
 import {
 	INITIAL_GAME_STATE,
 	SLOT_INTERACTION,
