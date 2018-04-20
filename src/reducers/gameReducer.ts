@@ -16,12 +16,13 @@ import {
 import {
 	shuffle,
 	isOpponentSlot,
-	getAbsoluteCoords,
-	getRelativeCoords,
 	getRelativeCoord,
 	getSlotValue,
 	relativeCoordSearch,
-	toggleActivePlayer
+	toggleActivePlayer,
+	getMoveCards,
+	getCandidateCoords,
+	getRelativeCoordsByMoveCard
 } from '../utils';
 
 export const DEFAULT_STATE = Map({
@@ -46,18 +47,11 @@ export const DEFAULT_STATE = Map({
 	activePlayer: null,
 	moveHistory: List(),
 	winner: null,
-	isChoosingMoveCard: false
+	isChoosingMoveCard: false,
+	mode: c.MODE_HUMAN
 });
 
-const _getMoveCards = (state: any) => {
-	let isBlueActive = state.get('activePlayer') === c.BLUE;
-	return List([
-		state.getIn([isBlueActive ? 'blueMoveCard1' : 'redMoveCard1', 'card']),
-		state.getIn([isBlueActive ? 'blueMoveCard2' : 'redMoveCard2', 'card'])
-	]);
-};
-
-const getInitialGameState = (state: any) => {
+const getInitialGameState = (state: any, payload?: any) => {
 	const shuffledCards = fromJS(shuffle(cards));
 	const nextState = Map({
 		winner: null,
@@ -77,31 +71,16 @@ const getInitialGameState = (state: any) => {
 		blueMoveCard2: shuffledCards.get(2),
 		redMoveCard1: shuffledCards.get(3),
 		redMoveCard2: shuffledCards.get(4),
-		activePlayer: shuffledCards.getIn([0, 'player'])
+		activePlayer: shuffledCards.getIn([0, 'player']),
+		mode: (payload && payload.mode === c.MODE_HUMAN) ? c.MODE_HUMAN : c.MODE_COMPUTER
 	});
 
 	return state.merge(nextState);
 };
 
-const _getCandidateCoords = (state: any, acoord: any) => {
-	const moveCards = _getMoveCards(state);
-	const moveCard1AbsoluteCoords = getAbsoluteCoords(moveCards.get(0));
-	const moveCard2AbsoluteCoords = getAbsoluteCoords(moveCards.get(1));
-	const moveCard1RelativeCoords = getRelativeCoords(c.CENTER, moveCard1AbsoluteCoords);
-	const moveCard2RelativeCoords = getRelativeCoords(c.CENTER, moveCard2AbsoluteCoords);
-	const moveCardCoords = moveCard1RelativeCoords.concat(moveCard2RelativeCoords);
-
-	return moveCardCoords.map((coord: any) => {
-		return Map({
-			x: acoord.get('x') + coord.get('x'),
-			y: acoord.get('y') + coord.get('y')
-		});
-	});
-};
-
 const handleSlotInteraction = (state: any, payload: any) => {
 	const nextState = Map({
-		candidateCoords: _getCandidateCoords(state, payload.coord),
+		candidateCoords: getCandidateCoords(state, payload.coord),
 		activeSlotCoord: Map(payload.coord)
 	});
 
@@ -132,20 +111,26 @@ const _getNextCapturedPieces = (state: any, coord: Coord) => {
 	}
 };
 
-const _getNextBoard = (state: any, coord: Coord) => {
+const _getNextBoard = (state: any, payload: any) => {
 	const board = state.get('board');
-	const activeCoord = state.get('activeSlotCoord');
+	const srcCoord = payload.srcCoord;
+	const targetCoord = payload.targetCoord;
 
-	return board.updateIn([coord.get('x'), coord.get('y')], () => getSlotValue(board, activeCoord))
-				.updateIn([activeCoord.get('x'), activeCoord.get('y')], () => c.EMPTY);
-
+	return board.updateIn([srcCoord.get('x'), srcCoord.get('y')], () => c.EMPTY)
+				.updateIn([targetCoord.get('x'), targetCoord.get('y')], () => getSlotValue(board, srcCoord));
 };
 
-const _getNextMoveHistory = (state: any, coord: Coord) => {
+const _getNextMoveHistory = (state: any, payload: any) => {
 	return state.get('moveHistory').update((list: any) => {
 		return list.push(Map({
-			x: coord.get('x'),
-			y: coord.get('y'),
+			srcCoord: Map({
+				x: payload.srcCoord.get('x'),
+				y: payload.srcCoord.get('y'),
+			}),
+			targetCoord: Map({
+				x: payload.targetCoord.get('x'),
+				y: payload.targetCoord.get('y')
+			}),
 			player: state.get('activePlayer')
 		}));
 	});
@@ -175,12 +160,18 @@ const checkForWinner = (state: any) => {
 	return state.set('winner', null);
 };
 
+/**
+ * should take a source and target coord pair and return the next game state
+ * card exchange happens it's the other players trun.
+ * @param {String} state application state Map.
+ * @param {String} moveCard state property name of the move card to be exchanged.
+ */
 const performMove = (state: any, payload: any) => {
 	const nextState = Map({
-		board: _getNextBoard(state, payload.coord),
-		capturedPieces: _getNextCapturedPieces(state, payload.coord),
-		moveHistory: _getNextMoveHistory(state, payload.coord),
-		lastMoveRelativeCoords: getRelativeCoord(payload.coord, state.get('activeSlotCoord')),
+		board: _getNextBoard(state, payload),
+		capturedPieces: _getNextCapturedPieces(state, payload.targetCoord),
+		moveHistory: _getNextMoveHistory(state, payload),
+		lastMoveRelativeCoords: getRelativeCoord(payload.targetCoord, payload.srcCoord),
 		activeSlotCoord: c.EMPTY_COORD,
 		candidateCoords: List()
 	});
@@ -221,13 +212,11 @@ const _swapMoveCard2 = (state: any) => {
 
 const autoMoveCardExchange = (state: any) => {
 	let nextState;
-	const moveCards = _getMoveCards(state);
+	const moveCards = getMoveCards(state);
 	const lastMoveCoords = state.get('lastMoveRelativeCoords');
 
-	const moveCard1AbsoluteCoords = getAbsoluteCoords(moveCards.get(0));
-	const moveCard2AbsoluteCoords = getAbsoluteCoords(moveCards.get(1));
-	const moveCard1RelativeCoords = getRelativeCoords(c.CENTER, moveCard1AbsoluteCoords);
-	const moveCard2RelativeCoords = getRelativeCoords(c.CENTER, moveCard2AbsoluteCoords);
+	const moveCard1RelativeCoords = getRelativeCoordsByMoveCard(moveCards.get(0));
+	const moveCard2RelativeCoords = getRelativeCoordsByMoveCard(moveCards.get(1));
 
 	const card1SearchResults = relativeCoordSearch(lastMoveCoords, moveCard1RelativeCoords);
 	const card2SearchResults = relativeCoordSearch(lastMoveCoords, moveCard2RelativeCoords);
@@ -256,7 +245,7 @@ const resetGame = (state: any) => {
 const gameReducer = (state = DEFAULT_STATE, action: any) => {
 	switch (action.type) {
 		case INITIAL_GAME_STATE:
-			return getInitialGameState(state);
+			return getInitialGameState(state, action.payload);
 		case SLOT_INTERACTION:
 			return handleSlotInteraction(state, action.payload);
 		case PERFORM_MOVE:
