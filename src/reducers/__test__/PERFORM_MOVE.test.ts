@@ -1,7 +1,7 @@
 import gameReducer from '../gameReducer';
 import { Map, fromJS, List } from 'immutable';
 import { getSlotValue } from '../../utils';
-import c from '../../constants/game-constants';
+import * as c from '../../constants/game-constants';
 import { PERFORM_MOVE } from '../../constants/action-constants';
 
 const DEFAULT_STATE = Map({

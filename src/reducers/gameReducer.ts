@@ -1,10 +1,11 @@
 import { List, Map, fromJS } from 'immutable';
 import { Coord } from '../typings';
 import cards from '../cards';
-import c from '../constants/game-constants';
+import * as c from '../constants/game-constants';
 
 import {
 	INITIAL_GAME_STATE,
+	SCHEDULE_COMPUTER_MOVE,
 	SLOT_INTERACTION,
 	PERFORM_MOVE,
 	MOVE_CARD_EXCHANGE,
@@ -46,15 +47,16 @@ export const DEFAULT_STATE = Map({
 	candidateCoords: List(),
 	activePlayer: null,
 	moveHistory: List(),
-	winner: null,
+	winner: false,
 	isChoosingMoveCard: false,
+	isComputerMoveScheduled: false,
 	mode: c.MODE_HUMAN
 });
 
 const getInitialGameState = (state: any, payload?: any) => {
 	const shuffledCards = fromJS(shuffle(cards));
 	const nextState = Map({
-		winner: null,
+		winner: false,
 		board: fromJS([
 			[c.RED, 0, 0, 0, c.BLUE],
 			[c.RED, 0, 0, 0, c.BLUE],
@@ -234,12 +236,16 @@ const autoMoveCardExchange = (state: any) => {
 	return state.merge(nextState);
 };
 
-const moveCardExchange = (state: any, moveCard: string) => {
-	return state.merge(_swapMoveCard(state, moveCard));
+const moveCardExchange = (state: any, payload: any) => {
+	return state.merge(_swapMoveCard(state, payload.moveCard));
 };
 
 const resetGame = (state: any) => {
 	return state.merge(getInitialGameState(state));
+};
+
+const scheduleComputerMove = (state: any, value: any) => {
+	return state.set('isComputerMoveScheduled', value);
 };
 
 const gameReducer = (state = DEFAULT_STATE, action: any) => {
@@ -253,11 +259,13 @@ const gameReducer = (state = DEFAULT_STATE, action: any) => {
 		case AUTO_MOVE_CARD_EXCHANGE:
 			return autoMoveCardExchange(state);
 		case MOVE_CARD_EXCHANGE:
-			return moveCardExchange(state, action.payload.moveCard);
+			return moveCardExchange(state, action.payload);
 		case CHECK_FOR_WINNER:
 			return checkForWinner(state);
 		case RESET_GAME:
 			return resetGame(state);
+		case SCHEDULE_COMPUTER_MOVE:
+			return scheduleComputerMove(state, action.payload);
 		default:
 			return state;
 	}

@@ -1,4 +1,4 @@
-import c from '../constants/game-constants';
+import * as c from '../constants/game-constants';
 
 export default [
 	{

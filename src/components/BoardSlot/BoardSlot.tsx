@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Board } from '../../typings';
 import { getSlotValue, isOpponentSlot } from '../../utils';
-import c from '../../constants/game-constants';
+import * as c from '../../constants/game-constants';
 import Piece from '../Piece';
 
 interface BoardSlotProps extends React.Props<BoardSlot> {

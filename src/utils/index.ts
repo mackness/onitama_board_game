@@ -1,5 +1,5 @@
 import { Map, List } from 'immutable';
-import c from '../constants/game-constants';
+import * as c from '../constants/game-constants';
 import { Board, Coord } from '../typings';
 
 /**
@@ -31,7 +31,7 @@ export function getAbsoluteCoords(card: any) {
 /**
  * Get the coords of active board pieces for a given player in order to make a move.
  * @return {List} a list of coordinates of all active board pieces.
- */	
+ */
 export function getSourceCoords(board: any, player: any) {
 	let sourceCoords = [];
 	for (var x = 0; x < board.size; x++) {

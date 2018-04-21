@@ -1,5 +1,5 @@
 import { getSlotValue } from '../utils';
-import c from '../constants/game-constants';
+import * as c from '../constants/game-constants';
 import {
 	INITIAL_GAME_STATE,
 	SLOT_INTERACTION,
@@ -70,40 +70,68 @@ export default class GameActions {
 
 	performPlayerMove(coords: any) {
 		return new Promise((resolve, reject) => {
-			this.store.dispatch({
-				type: PERFORM_MOVE,
-				payload: {
-					srcCoord: coords.srcCoord,
-					targetCoord: coords.targetCoord
-				}
-			});
-			resolve();
+			try {
+				this.store.dispatch({
+					type: PERFORM_MOVE,
+					payload: {
+						srcCoord: coords.srcCoord,
+						targetCoord: coords.targetCoord
+					}
+				});
+				resolve();
+			} catch (error) {
+				reject(error);
+			}
 		});
 	}
 
-	handleCandidateSlotInteraction(coords: any) {
+	_shouldPerformComputerMove() {
 		const state = this.store.getState().game;
+		return (
+			!state.get('winner') &&
+			!state.get('isChoosingMoveCard') &&
+			state.get('mode') === c.MODE_COMPUTER
+		);
+	}
 
+	handleCandidateSlotInteraction(coords: any) {
 		this.performPlayerMove(coords).then(() => {
-			if (!state.get('winner') &&
-				state.get('mode') === c.MODE_COMPUTER) {
+			this.handleMoveCardExchange();
+			if (this._shouldPerformComputerMove()) {
 				this.performComputerMove();
 			}
+		}).catch(() => {
+			// log move error
 		});
-
-		this.handleMoveCardExchange();
 
 		this.store.dispatch({
 			type: CHECK_FOR_WINNER
 		});
 	}
 
+	/**
+	 * Manages the exchange of move cards.
+	 * rules: if a move card is provided to this function then the reducer
+	 * will exchange the provided card with the swap card. If a move card is not provided
+	 * the reducer will attempt an auto move card exchange. if the auto move card echange fails
+	 * the user will be asked to explicitly choose a move card.
+	 * @param {String} moveCard - a move card id
+	 */
 	handleMoveCardExchange(moveCard?: any) {
+		const state = this.store.getState().game;
+		const mode = state.get('mode');
+		const activePlayer = state.get('activePlayer');
 		if (moveCard) {
 			this.store.dispatch({
 				type: MOVE_CARD_EXCHANGE,
 				payload: { moveCard }
 			});
+
+			// a computer move needs to be performed after the human player has
+			// chosen a move card
+			if (mode === c.MODE_COMPUTER && activePlayer === c.BLUE) {
+				this.performComputerMove();
+			}
 		} else {
 			this.store.dispatch({
 				type: AUTO_MOVE_CARD_EXCHANGE

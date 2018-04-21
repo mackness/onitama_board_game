@@ -1,5 +1,5 @@
 import * as React from 'react';
-import c from '../../constants/game-constants';
+import * as c from '../../constants/game-constants';
 
 interface PieceProps {
 	color: number;

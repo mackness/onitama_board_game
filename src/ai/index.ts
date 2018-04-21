@@ -1,5 +1,5 @@
 import { fromJS } from 'immutable';
-import c from '../constants/game-constants';
+import * as c from '../constants/game-constants';
 import Actions from '../actions';
 import {
 	getCandidateCoords,
@@ -25,7 +25,7 @@ export default class Ai {
 	/**
 	 * This method constructs a move by randomly selecting source and target move coords.
 	 * @return {Map} a map of all the data necessary to make a move.
-	 */	
+	 */
 	public makeBlindMove = () => {
 		const board = this.state.get('board');
 		const player = this.state.get('activePlayer');

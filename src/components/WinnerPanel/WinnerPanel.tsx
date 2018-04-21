@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import c from '../../constants/game-constants';
+import * as c from '../../constants/game-constants';
 
 interface WinnerPanelProps {
 	winner: number;

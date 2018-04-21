@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as renderer from 'react-test-renderer';
-import c from '../../../constants/game-constants';
+import * as c from '../../../constants/game-constants';
 import CardSlot from '../CardSlot';
 
 test('component', () => {

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Map } from 'immutable';
-import c from './constants/game-constants';
+import * as c from './constants/game-constants';
 import Card from './components/Card';
 import BoardSlot from './components/BoardSlot';
 import CapturedPieces from './components/CapturedPieces';
