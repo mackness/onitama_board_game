@@ -5,7 +5,6 @@ import * as c from '../constants/game-constants';
 
 import {
 	INITIAL_GAME_STATE,
-	SCHEDULE_COMPUTER_MOVE,
 	SLOT_INTERACTION,
 	PERFORM_MOVE,
 	MOVE_CARD_EXCHANGE,
@@ -26,44 +25,11 @@ import {
 	getRelativeCoordsByMoveCard
 } from '../utils';
 
-export const DEFAULT_STATE = Map({
-	board: fromJS([
-		[c.RED, 0, 0, 0, c.BLUE],
-		[c.RED, 0, 0, 0, c.BLUE],
-		[c.RED_MASTER, 0, 0, 0, c.BLUE_MASTER],
-		[c.RED, 0, 0, 0, c.BLUE],
-		[c.RED, 0, 0, 0, c.BLUE]
-	]),
-	capturedPieces: Map({
-		red: List([0, 0, 0, 0, 0]),
-		blue: List([0, 0, 0, 0, 0]),
-	}),
-	swapCard: c.DEFAULT_CARD,
-	redMoveCard1: c.DEFAULT_CARD,
-	redMoveCard2: c.DEFAULT_CARD,
-	blueMoveCard1: c.DEFAULT_CARD,
-	blueMoveCard2: c.DEFAULT_CARD,
-	activeSlotCoord: c.EMPTY_COORD,
-	candidateCoords: List(),
-	activePlayer: null,
-	moveHistory: List(),
-	winner: false,
-	isChoosingMoveCard: false,
-	isComputerMoveScheduled: false,
-	mode: c.MODE_HUMAN
-});
-
 const getInitialGameState = (state: any, payload?: any) => {
 	const shuffledCards = fromJS(shuffle(cards));
 	const nextState = Map({
 		winner: false,
-		board: fromJS([
-			[c.RED, 0, 0, 0, c.BLUE],
-			[c.RED, 0, 0, 0, c.BLUE],
-			[c.RED_MASTER, 0, 0, 0, c.BLUE_MASTER],
-			[c.RED, 0, 0, 0, c.BLUE],
-			[c.RED, 0, 0, 0, c.BLUE]
-		]),
+		board: c.DEFAULT_BOARD,
 		capturedPieces: Map({
 			red: List([0, 0, 0, 0, 0]),
 			blue: List([0, 0, 0, 0, 0])
@@ -80,13 +46,50 @@ const getInitialGameState = (state: any, payload?: any) => {
 	return state.merge(nextState);
 };
 
-const handleSlotInteraction = (state: any, payload: any) => {
-	const nextState = Map({
-		candidateCoords: getCandidateCoords(state, payload.coord),
-		activeSlotCoord: Map(payload.coord)
-	});
+const _isCandidateSlot = (state: any, slot: any): boolean => {
+	return true;
+};
 
-	return state.merge(nextState);
+const _isActiveSlot = (state: any, slot: any): boolean => {
+	return true;
+};
+
+const _applyStateToBoard = (state: any, coords: any) => {
+	const board = state.get('board');
+
+	return board.map((col: any, x: number) => {
+		return col.map((slot: any, y: number) => {
+			switch (true) {
+				case _isCandidateSlot(state, slot) && _isActiveSlot(state, slot):
+					return Map({
+						isCandidate: true,
+						isActive: true,
+						value: slot.get('value')
+					});
+				case _isCandidateSlot(state, slot):
+					return Map({
+						isCandidate: true,
+						isActive: false,
+						value: slot.get('value')
+					});
+				case _isActiveSlot(state, slot):
+					return Map({
+						isCandidate: false,
+						isActive: true,
+						value: slot.get('value')
+					});
+				default:
+					return slot;
+			}
+		});
+	});
+};
+
+const handleSlotInteraction = (state: any, payload: any) => {
+	return state.merge(Map ({
+		board: _applyStateToBoard(state, getCandidateCoords(state, payload.coord)),
+		activeSlotCoord: Map(payload.coord)
+	}));
 };
 
 const _getNextCapturedPieces = (state: any, coord: Coord) => {
@@ -174,7 +177,6 @@ const performMove = (state: any, payload: any) => {
 		capturedPieces: _getNextCapturedPieces(state, payload.targetCoord),
 		moveHistory: _getNextMoveHistory(state, payload),
 		lastMoveRelativeCoords: getRelativeCoord(payload.targetCoord, payload.srcCoord),
-		activeSlotCoord: c.EMPTY_COORD,
 		candidateCoords: List()
 	});
 
@@ -244,9 +246,26 @@ const resetGame = (state: any) => {
 	return state.merge(getInitialGameState(state));
 };
 
-const scheduleComputerMove = (state: any, value: any) => {
-	return state.set('isComputerMoveScheduled', value);
-};
+export const DEFAULT_STATE = Map({
+	board: c.DEFAULT_BOARD,
+	capturedPieces: Map({
+		red: List([0, 0, 0, 0, 0]),
+		blue: List([0, 0, 0, 0, 0]),
+	}),
+	swapCard: c.DEFAULT_CARD,
+	redMoveCard1: c.DEFAULT_CARD,
+	redMoveCard2: c.DEFAULT_CARD,
+	blueMoveCard1: c.DEFAULT_CARD,
+	blueMoveCard2: c.DEFAULT_CARD,
+	activeSlotCoord: c.EMPTY_COORD,
+	candidateCoords: List(),
+	activePlayer: null,
+	moveHistory: List(),
+	winner: false,
+	isChoosingMoveCard: false,
+	isComputerMoveScheduled: false,
+	mode: c.MODE_HUMAN
+});
 
 const gameReducer = (state = DEFAULT_STATE, action: any) => {
 	switch (action.type) {
@@ -264,8 +283,6 @@ const gameReducer = (state = DEFAULT_STATE, action: any) => {
 			return checkForWinner(state);
 		case RESET_GAME:
 			return resetGame(state);
-		case SCHEDULE_COMPUTER_MOVE:
-			return scheduleComputerMove(state, action.payload);
 		default:
 			return state;
 	}

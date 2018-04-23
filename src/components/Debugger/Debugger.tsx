@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 
-interface DebuggerProps  {
+interface DebuggerProps {
 	activeSlotCoord: any;
 	candidateCoords: any;
 	activePlayer: number;

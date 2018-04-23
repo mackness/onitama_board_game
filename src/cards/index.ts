@@ -3,7 +3,7 @@ import * as c from '../constants/game-constants';
 export default [
 	{
 		school: 'goose',
-		color: 'blue',
+		color: '#6a7f9a',
 		player: c.BLUE,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -15,7 +15,7 @@ export default [
 	},
 	{
 		school: 'frog',
-		color: 'blue',
+		color: '#6a7f9a',
 		player: c.RED,
 		card: [
 			[0, 0, c.MOVE, 0, 0],
@@ -27,7 +27,7 @@ export default [
 	},
 	{
 		school: 'eel',
-		color: 'blue',
+		color: '#6a7f9a',
 		player: c.BLUE,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -39,7 +39,7 @@ export default [
 	},
 	{
 		school: 'horse',
-		color: 'blue',
+		color: '#6a7f9a',
 		player: c.RED,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -51,7 +51,7 @@ export default [
 	},
 	{
 		school: 'boar',
-		color: 'green',
+		color: '#848877',
 		player: c.RED,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -63,7 +63,7 @@ export default [
 	},
 	{
 		school: 'mantis',
-		color: 'green',
+		color: '#848877',
 		player: c.RED,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -75,7 +75,7 @@ export default [
 	},
 	{
 		school: 'crab',
-		color: 'green',
+		color: '#848877',
 		player: c.BLUE,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -87,7 +87,7 @@ export default [
 	},
 	{
 		school: 'dragon',
-		color: 'green',
+		color: '#848877',
 		player: c.RED,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -99,7 +99,7 @@ export default [
 	},
 	{
 		school: 'cobra',
-		color: 'red',
+		color: '#915958',
 		player: c.RED,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -111,7 +111,7 @@ export default [
 	},
 	{
 		school: 'ox',
-		color: 'red',
+		color: '#915958',
 		player: c.BLUE,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -123,7 +123,7 @@ export default [
 	},
 	{
 		school: 'rooster',
-		color: 'red',
+		color: '#915958',
 		player: c.RED,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -135,7 +135,7 @@ export default [
 	},
 	{
 		school: 'rabbit',
-		color: 'red',
+		color: '#915958',
 		player: c.BLUE,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -147,7 +147,7 @@ export default [
 	},
 	{
 		school: 'crane',
-		color: 'dark-green',
+		color: '#6a6d60',
 		player: c.BLUE,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -159,7 +159,7 @@ export default [
 	},
 	{
 		school: 'monkey',
-		color: 'dark-green',
+		color: '#6a6d60',
 		player: c.BLUE,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -171,7 +171,7 @@ export default [
 	},
 	{
 		school: 'elephant',
-		color: 'dark-green',
+		color: '#6a6d60',
 		player: c.RED,
 		card: [
 			[0, 0, 0, 0, 0],
@@ -183,7 +183,7 @@ export default [
 	},
 	{
 		school: 'tiger',
-		color: 'dark-green',
+		color: '#6a6d60',
 		player: c.RED,
 		card: [
 			[0, 0, 0, 0, 0],

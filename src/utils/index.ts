@@ -8,7 +8,9 @@ import { Board, Coord } from '../typings';
  * @param {Map} coords - a Map of x y coordinates.
  */
 export function getSlotValue(board: Board, coord: any)  {
-	return board.getIn([coord.get('x'), coord.get('y')]);
+	return board
+			.getIn([coord.get('x'), coord.get('y')])
+			.get('value');
 }
 
 /**

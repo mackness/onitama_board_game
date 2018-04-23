@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
+import styled from 'styled-components';
 import { Map } from 'immutable';
 import * as c from './constants/game-constants';
 import Card from './components/Card';
@@ -25,6 +26,27 @@ interface OnitamaProps extends React.Props<Onitama> {
 interface OnitamaState {
 
 }
+
+const Board = styled.div`
+	border-left: solid 1px #000;
+	border-right: solid 1px #000;
+	border-top: solid 1px #000;
+	display: flex;
+	justify-content: space-around;
+	margin-right: 20px;
+	overflow: hidden;
+`;
+
+const Column = styled.div`
+	border-right: solid 1px #000;
+`;
+
+const FlexColumn = styled.div`
+	display: flex;
+	margin-bottom: 20px;
+	margin-top: 20px;
+	width: 425px;
+`;
 
 class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 
@@ -71,7 +93,7 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 		} = this.props;
 		return (
 			<div>
-				<div className='cards'>
+				<FlexColumn>
 					<Card
 						card={redMoveCard1}
 						interaction={this.moveCardInteraction}
@@ -82,29 +104,29 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 						interaction={this.moveCardInteraction}
 						label={c.RED_MOVE_CARD_2}
 					/>
-				</div>
-				<div className='cards'>
-					<div className='board'>
+				</FlexColumn>
+				<FlexColumn>
+					<Board>
 						{board.map((col: any, x: any) => (
-							<div className='col' key={x}>
+							<Column key={x}>
 								{col.map((slot: any, y: number) => (
 									<BoardSlot
 										key={y}
-										slotValue={slot}
+										slot={slot}
 										slotCoord={Map({x, y})}
 										actions={this.props.actions}
 									/>
 								))}
-							</div>
+							</Column>
 						))}
-					</div>
+					</Board>
 					<Card
 						card={swapCard}
 						interaction={this.moveCardInteraction}
 						label={c.SWAP_CARD}
 					/>
-				</div>
-				<div className='cards'>
+				</FlexColumn>
+				<FlexColumn>
 					<Card
 						card={blueMoveCard1}
 						interaction={this.moveCardInteraction}
@@ -115,7 +137,7 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 						interaction={this.moveCardInteraction}
 						label={c.BLUE_MOVE_CARD_2}
 					/>
-				</div>
+				</FlexColumn>
 				<ActivePlayerPanel />
 				<CapturedPieces />
 				<WinnerPanel actions={this.props.actions} />

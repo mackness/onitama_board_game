@@ -3,8 +3,16 @@ import { ImmutableMap } from './ImmutableMap';
 
 export declare type Board = List<List<number>>;
 export declare type SwapCard = List<List<number>>;
-export declare type Coords = List<ImmutableMap<string|number|any>>;
-export declare type Coord = ImmutableMap<string|number|any>;
+
+export declare type Coord = ImmutableMap<{
+	x: number;
+	y: number;
+}>;
+
+export declare type Slot = ImmutableMap<{
+	isActive: number;
+	isCandidate: number;
+}>;
 
 export interface Card {
 	school: string;
@@ -20,7 +28,7 @@ export interface ApplicationState {
 	blueMoveCard1?: Card;
 	blueMoveCard2?: Card;
 	activeSlotCoord?: Coord;
-	candidateCoords?: Coords;
+	candidateCoords?: Coord;
 	activePlayer?: number;
 	moveHistory?: List<ImmutableMap<string|number>>;
 	isChoosingMoveCard?: boolean;

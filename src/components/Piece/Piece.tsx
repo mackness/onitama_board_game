@@ -1,34 +1,45 @@
 import * as React from 'react';
 import * as c from '../../constants/game-constants';
+import styled from 'styled-components';
 
 interface PieceProps {
 	color: number;
 	size?: string;
 }
 
-const _getCapturedClass = (size: string|undefined) => {
-	return size === 'small' ? 'piece--small' : null;
-};
+const Piece = styled.span`
+	align-items: center;
+	border-radius: 50%;
+	background-color: ${(props: any) => props.theme.color}
+	display: flex;
+	height: ${(props: any) => props.theme.size === 'small' ? '15px' : '20px'};
+	justify-content: center;
+	width: ${(props: any) => props.theme.size === 'small' ? '15px' : '20px'};
+`;
 
-const CardSlot: React.StatelessComponent<PieceProps> = ({color, size}) => {
+const PieceMaster = Piece.extend`
+	border-radius: 25%;
+`;
+
+const PieceComponent: React.StatelessComponent<PieceProps> = ({color, size}) => {
 	let piece = null;
 	switch (color) {
 		case c.RED:
-			piece = <span className={`piece piece--red ${_getCapturedClass(size)}`} />;
+			piece = <Piece theme={{color: '#fe5a59', size}}/>;
 			break;
-		case c.RED_MASTER:
-			piece = <span className={`piece piece--red piece--master ${_getCapturedClass(size)}`} />;
+		case c.RED_MASTER_VALUE:
+			piece = <PieceMaster theme={{color: '#fe5a59', size}}/>;
 			break;
 		case c.BLUE:
-			piece = <span className={`piece piece--blue ${_getCapturedClass(size)}`} />;
+			piece = <Piece theme={{color: '#69a1b0', size}}/>;
 			break;
-		case c.BLUE_MASTER:
-			piece = <span className={`piece piece--blue piece--master ${_getCapturedClass(size)}`} />;
+		case c.BLUE_MASTER_VALUE:
+			piece = <PieceMaster theme={{color: '#69a1b0', size}}/>;
 			break;
 		default:
-			piece = <span className={`piece ${_getCapturedClass(size)}`} />;
+			piece = <Piece theme={{color: 'transparent', size}}/>;
 	}
 	return piece;
 };
 
-export default CardSlot;
+export default PieceComponent;
