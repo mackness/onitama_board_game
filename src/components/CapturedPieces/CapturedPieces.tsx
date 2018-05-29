@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import Peice from '../Piece';
+import PieceFactory from '../PieceFactory';
 
 interface CapturedPiecesProps  {
 	capturedPieces: any;
@@ -15,10 +15,10 @@ const Label = styled.span`
 	margin-right: 5px;
 `;
 
-const _renderPiece = (value: number, i: number) => (
-	<Peice
+const _renderPiece = (slot: any, i: number) => (
+	<PieceFactory
 		key={i}
-		color={value}
+		piece={slot.get('piece')}
 		size='small'
 	/>
 );

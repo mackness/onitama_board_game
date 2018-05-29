@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import CardSlot from '../CardSlot';
-import Piece from '../Piece';
+import PieceFactory from '../PieceFactory';
 
 interface MoveCardProps {
 	card: any;
@@ -51,19 +51,19 @@ const MoveCard: React.StatelessComponent<MoveCardProps> = ({card, interaction, l
 			<CardGrid data-card={label} onClick={interaction}>
 				{card.get('card').map((col: any, x: any) => (
 					<Column key={x}>
-						{col.map((slot: any, y: number) => (
-							<CardSlot
-								color={card.get('color')}
+						{col.map((slot: any, y: number) => {
+							return <CardSlot
 								key={y}
-								value={slot}
-							/>
-						))}
+								type={slot}
+								color={card.get('color')}
+							/>;
+						})}
 					</Column>
 				))}
 			</CardGrid>
 			<CardMetaRow>
 				<Label>{card.get('school')}</Label>
-				<Piece color={card.get('player')} size='small' />
+				<PieceFactory piece={card.get('piece')} size='small' />
 			</CardMetaRow>
 		</Card>
 	);

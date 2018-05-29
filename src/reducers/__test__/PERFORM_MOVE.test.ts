@@ -1,30 +1,29 @@
 import gameReducer from '../gameReducer';
-import { Map, fromJS, List } from 'immutable';
+import { Map, List } from 'immutable';
 import { getSlotValue } from '../../utils';
 import * as c from '../../constants/game-constants';
+import { Mode, Player } from '../../typings';
 import { PERFORM_MOVE } from '../../constants/action-constants';
 
-const DEFAULT_STATE = Map({
-	board: fromJS([
-		[c.RED, 0, 0, 0, c.BLUE],
-		[c.RED, 0, 0, 0, c.BLUE],
-		[c.RED_MASTER, 0, 0, 0, c.BLUE_MASTER],
-		[c.RED, 0, 0, 0, c.BLUE],
-		[c.RED, 0, 0, 0, c.BLUE]
-	]),
+export const DEFAULT_STATE = Map({
+	board: c.DEFAULT_BOARD,
+	capturedPieces: Map({
+		red: List([0, 0, 0, 0, 0]),
+		blue: List([0, 0, 0, 0, 0]),
+	}),
 	swapCard: c.DEFAULT_CARD,
 	redMoveCard1: c.DEFAULT_CARD,
 	redMoveCard2: c.DEFAULT_CARD,
 	blueMoveCard1: c.DEFAULT_CARD,
 	blueMoveCard2: c.DEFAULT_CARD,
-	activeSlotCoord: Map({
-		x: 4,
-		y: 4
-	}),
+	activeSlotCoord: c.EMPTY_COORD,
 	candidateCoords: List(),
-	activePlayer: c.BLUE,
+	activePlayer: null,
 	moveHistory: List(),
-	isChoosingMoveCard: false
+	winner: false,
+	isChoosingMoveCard: false,
+	isComputerMoveScheduled: false,
+	mode: Mode.COMPUTER
 });
 
 test('game reducer', () => {
@@ -46,7 +45,7 @@ test('game reducer', () => {
 		expect(nextState.get('moveHistory').get(0)).toEqual(Map({
 			x: -1,
 			y: -1,
-			player: c.BLUE
+			player: Player.BLUE
 		}));
 
 		// the target coordinates value to not be null

@@ -1,27 +1,27 @@
 import * as React from 'react';
-import * as c from '../../constants/game-constants';
 import styled from 'styled-components';
+import { MoveCard } from '../../typings';
 
 interface CardSlotProps {
-	value: number;
 	color?: string;
+	type?: number;
 }
 
 const Slot = styled.div`
-	background-color: ${(props: any) => props.color}
+	background-color: ${(props: any) => props.theme.color}
 	height: 30px;
 	width: 30px;
 	border-bottom: solid 1px #000;
 `;
 
-const CardSlot: React.StatelessComponent<CardSlotProps> = ({value, color}) => {
-	switch (value) {
-		case c.MOVE:
-			return <Slot color={color} />;
-		case c.START:
-			return <Slot color={'#000'} />;
+const CardSlot: React.StatelessComponent<CardSlotProps> = ({type, color}) => {
+	switch (type) {
+		case MoveCard.MOVE:
+			return <Slot theme={{color}} />;
+		case MoveCard.START:
+			return <Slot theme={{color: '#000'}} />;
 		default:
-			return <Slot color={'transparent'} />;
+			return <Slot theme={{color: 'transparent'}} />;
 	}
 };
 

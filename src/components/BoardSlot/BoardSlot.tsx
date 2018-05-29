@@ -2,8 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { Board } from '../../typings';
-import { getSlotValue } from '../../utils';
-import Piece from '../Piece';
+import PieceFactory from '../PieceFactory';
 
 interface BoardSlotProps extends React.Props<BoardSlot> {
 	actions: any;
@@ -11,6 +10,9 @@ interface BoardSlotProps extends React.Props<BoardSlot> {
 	activePlayer: number;
 	board: Board;
 	candidateCoords: any;
+	coord: any;
+	piece: any;
+	player: number;
 	slotCoord: any;
 	slotValue: number;
 	slot: any;
@@ -22,18 +24,20 @@ interface BoardSlotState {
 
 const Slot = styled.div`
 	align-items: center;
-	background-color: ${(props: any) => {
-		if (props.theme.isCandidate || props.theme.isActive) {
-			return '#ccc';
-		} else {
-			return 'transparent';
-		}
-	}}
+	background-color: transparent;
 	border-bottom: 1px solid #000;
 	display: flex;
 	height: 50px;
 	justify-content: center;
 	width: 50px;
+`;
+
+const ActiveSlot = Slot.extend`
+	background-color: #ccc;
+`;
+
+const CandidateSlot = Slot.extend`
+	background-color: #ccc;
 `;
 
 class BoardSlot extends React.Component<BoardSlotProps, BoardSlotState> {
@@ -43,39 +47,58 @@ class BoardSlot extends React.Component<BoardSlotProps, BoardSlotState> {
 		this.state = {};
 	}
 
-	_handleSlotInteraction = (event: any) => {
-		let { activePlayer, board, slotCoord, activeSlotCoord } = this.props;
-		if (event.currentTarget.classList.contains('candidate') && getSlotValue(board, slotCoord) !== activePlayer) {
+	_handleSlotInteraction = () => {
+		let { activePlayer, coord, player } = this.props;
+		if (activePlayer === player) {
+			this.props.actions.gameActions.handleSlotInteraction(coord);
+		}
+	}
+
+	_handleCandidateSlotInteraction  = (event: any) => {
+		let { activePlayer, coord, player, activeSlotCoord } = this.props;
+		if (activePlayer !== player) {
 			this.props.actions.gameActions.handleCandidateSlotInteraction({
 				srcCoord: activeSlotCoord,
-				targetCoord: slotCoord
+				targetCoord: coord
 			});
-		} else {
-			this.props.actions.gameActions.handleSlotInteraction(slotCoord);
 		}
 	}
 
 	render() {
-		return (
-			<Slot
-				onClick={this._handleSlotInteraction}
-				theme={{
-					isActive: this.props.slot.get('isActive'),
-					isCandidate: this.props.slot.get('isCandidate')
-				}}
-			>
-				<Piece color={this.props.slot.get('value')} />
-			</Slot>
-		);
+		const { slot, piece } = this.props;
+		const theme = {
+			isActive: this.props.slot.get('isActive'),
+			isCandidate: this.props.slot.get('isCandidate')
+		};
+		if (slot.get('isActive')) {
+			return (
+				<ActiveSlot theme={theme}>
+					<PieceFactory piece={piece} size='large' />
+				</ActiveSlot>
+			);
+		} else if (slot.get('isCandidate')) {
+			return (
+				<CandidateSlot onClick={this._handleSlotInteraction} theme={theme}>
+					<PieceFactory piece={piece} size='large' />
+				</CandidateSlot>
+			);
+		} else {
+			return (
+				<Slot onClick={this._handleSlotInteraction} theme={theme}>
+					<PieceFactory piece={piece} size='large' />
+				</Slot>
+			);
+		}
 	}
 }
 
 const mapStateToProps = (state: any, props: any) => {
 	return {
-		board: state.game.get('board'),
 		activePlayer: state.game.get('activePlayer'),
 		activeSlotCoord: state.game.get('activeSlotCoord'),
-		candidateCoords: state.game.get('candidateCoords')
+		coord: props.slot.get('coord'),
+		player: props.slot.getIn(['piece', 'player']),
+		piece: props.slot.getIn(['piece', 'piece'])
 	};
 };
 

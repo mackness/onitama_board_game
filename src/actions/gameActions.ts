@@ -1,5 +1,5 @@
-import { getSlotValue } from '../utils';
-import * as c from '../constants/game-constants';
+import { getPieceProperty } from '../utils';
+import { Mode, Player, Piece } from '../typings';
 import {
 	INITIAL_GAME_STATE,
 	SLOT_INTERACTION,
@@ -36,8 +36,8 @@ export default class GameActions {
 	setupInitialGameState(mode: string) {
 		this.initGame(mode)
 			.then((state: any) => {
-				if (state.get('activePlayer') === c.RED &&
-					state.get('mode') === c.MODE_COMPUTER) {
+				if (state.get('activePlayer') === Player.RED &&
+					state.get('mode') === Mode.COMPUTER) {
 					this.performComputerMove();
 				}
 			})
@@ -48,7 +48,7 @@ export default class GameActions {
 
 	handleSlotInteraction(coord: any) {
 		const board = this.store.getState().game.get('board');
-		if (getSlotValue(board, coord) !== c.EMPTY) {
+		if (getPieceProperty(board, coord, 'piece') !== Piece.EMPTY) {
 			this.store.dispatch({
 				type: SLOT_INTERACTION,
 				payload: { coord }
@@ -90,7 +90,7 @@ export default class GameActions {
 		return (
 			!state.get('winner') &&
 			!state.get('isChoosingMoveCard') &&
-			state.get('mode') === c.MODE_COMPUTER
+			state.get('mode') === Mode.COMPUTER
 		);
 	}
 
@@ -129,7 +129,7 @@ export default class GameActions {
 
 			// a computer move needs to be performed after the human player has
 			// chosen a move card
-			if (mode === c.MODE_COMPUTER && activePlayer === c.BLUE) {
+			if (mode === Mode.COMPUTER && activePlayer === Player.BLUE) {
 				this.performComputerMove();
 			}
 		} else {

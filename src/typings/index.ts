@@ -1,6 +1,38 @@
 import { List } from 'immutable';
 import { ImmutableMap } from './ImmutableMap';
 
+export enum Piece {
+	EMPTY,
+	BLUE_PAWN,
+	BLUE_MASTER,
+	RED_PAWN,
+	RED_MASTER
+}
+
+export enum Player {
+	BLUE,
+	RED
+}
+
+export enum Mode {
+	COMPUTER,
+	HUMAN
+}
+
+export enum MoveCards {
+	SWAP_CARD,
+	BLUE_MOVE_CARD_1,
+	BLUE_MOVE_CARD_2,
+	RED_MOVE_CARD_1,
+	RED_MOVE_CARD_2
+}
+
+export enum MoveCard {
+	EMPTY,
+	START,
+	MOVE
+}
+
 export declare type Board = List<List<number>>;
 export declare type SwapCard = List<List<number>>;
 
@@ -12,6 +44,7 @@ export declare type Coord = ImmutableMap<{
 export declare type Slot = ImmutableMap<{
 	isActive: number;
 	isCandidate: number;
+	piece: Piece;
 }>;
 
 export interface Card {

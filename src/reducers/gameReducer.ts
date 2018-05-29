@@ -1,5 +1,5 @@
 import { List, Map, fromJS } from 'immutable';
-import { Coord } from '../typings';
+import { Coord, Mode, Piece, Player, MoveCards, Slot } from '../typings';
 import cards from '../cards';
 import * as c from '../constants/game-constants';
 
@@ -17,66 +17,67 @@ import {
 	shuffle,
 	isOpponentSlot,
 	getRelativeCoord,
-	getSlotValue,
 	relativeCoordSearch,
 	toggleActivePlayer,
 	getMoveCards,
 	getCandidateCoords,
-	getRelativeCoordsByMoveCard
+	getRelativeCoordsByMoveCard,
+	getPieceProperty
 } from '../utils';
 
 const getInitialGameState = (state: any, payload?: any) => {
 	const shuffledCards = fromJS(shuffle(cards));
+	const swapCardPiece =  shuffledCards.getIn([0, 'piece']);
 	const nextState = Map({
 		winner: false,
 		board: c.DEFAULT_BOARD,
-		capturedPieces: Map({
-			red: List([0, 0, 0, 0, 0]),
-			blue: List([0, 0, 0, 0, 0])
-		}),
+		capturedPieces: c.DEFAULT_CAPTURED_PIECES,
 		swapCard: shuffledCards.get(0),
 		blueMoveCard1: shuffledCards.get(1),
 		blueMoveCard2: shuffledCards.get(2),
 		redMoveCard1: shuffledCards.get(3),
 		redMoveCard2: shuffledCards.get(4),
-		activePlayer: shuffledCards.getIn([0, 'player']),
-		mode: (payload && payload.mode === c.MODE_HUMAN) ? c.MODE_HUMAN : c.MODE_COMPUTER
+		activePlayer: swapCardPiece === Piece.RED_PAWN ? Player.RED : Player.BLUE,
+		mode: (payload && payload.mode === Mode.HUMAN) ? Mode.HUMAN : Mode.COMPUTER
 	});
 
 	return state.merge(nextState);
 };
 
-const _isCandidateSlot = (state: any, slot: any): boolean => {
-	return true;
+const _isCandidateSlot = (slot: any, candidateCoords: any): boolean => {
+	return fromJS(candidateCoords).contains(slot.get('coord'));
 };
 
-const _isActiveSlot = (state: any, slot: any): boolean => {
-	return true;
+const _isActiveSlot = (slot: any, activeCoord: any): boolean => {
+	return activeCoord.equals(slot.get('coord'));
 };
 
-const _applyStateToBoard = (state: any, coords: any) => {
+/**
+ * based on given inputs this function should apply the next board state to the board structure
+ * @param {Map} state application state Map.
+ * @param {Object} coord coordinate object from action payload.
+ */
+const _applyNextBoardState = (state: any, coord: any) => {
 	const board = state.get('board');
+	const candidateCoords = getCandidateCoords(state, coord);
 
 	return board.map((col: any, x: number) => {
 		return col.map((slot: any, y: number) => {
 			switch (true) {
-				case _isCandidateSlot(state, slot) && _isActiveSlot(state, slot):
-					return Map({
+				case _isCandidateSlot(slot, candidateCoords) && _isActiveSlot(slot, coord):
+					return slot.merge({
 						isCandidate: true,
-						isActive: true,
-						value: slot.get('value')
+						isActive: true
 					});
-				case _isCandidateSlot(state, slot):
-					return Map({
+				case _isCandidateSlot(slot, candidateCoords):
+					return slot.merge({
 						isCandidate: true,
-						isActive: false,
-						value: slot.get('value')
+						isActive: false
 					});
-				case _isActiveSlot(state, slot):
-					return Map({
+				case _isActiveSlot(slot, coord):
+					return slot.merge({
 						isCandidate: false,
-						isActive: true,
-						value: slot.get('value')
+						isActive: true
 					});
 				default:
 					return slot;
@@ -86,9 +87,10 @@ const _applyStateToBoard = (state: any, coords: any) => {
 };
 
 const handleSlotInteraction = (state: any, payload: any) => {
+	const coord = payload.coord;
 	return state.merge(Map ({
-		board: _applyStateToBoard(state, getCandidateCoords(state, payload.coord)),
-		activeSlotCoord: Map(payload.coord)
+		board: _applyNextBoardState(state, coord),
+		activeSlotCoord: Map(coord)
 	}));
 };
 
@@ -96,14 +98,14 @@ const _getNextCapturedPieces = (state: any, coord: Coord) => {
 	let updated = false;
 	const board = state.get('board');
 	const activePlayer = state.get('activePlayer');
-	const activePlayerKey = activePlayer === c.BLUE ? 'blue' : 'red';
+	const activePlayerKey = activePlayer === Player.BLUE ? 'blue' : 'red';
 
 	if (isOpponentSlot(activePlayer, board, coord)) {
 		const capturedPieces = state.getIn(['capturedPieces', activePlayerKey]);
 		const nextCapturedPieces = capturedPieces.map((piece: any) => {
 			if (piece === 0 && !updated) {
 				updated = true;
-				return getSlotValue(board, coord);
+				return getPieceProperty(board, coord, 'piece');
 			} else {
 				return piece;
 			}
@@ -116,13 +118,17 @@ const _getNextCapturedPieces = (state: any, coord: Coord) => {
 	}
 };
 
+
+// update this based on the new slot shape
+// remember you jsut added getSlotProperty and getPieceProperty
 const _getNextBoard = (state: any, payload: any) => {
 	const board = state.get('board');
 	const srcCoord = payload.srcCoord;
 	const targetCoord = payload.targetCoord;
 
-	return board.updateIn([srcCoord.get('x'), srcCoord.get('y')], () => c.EMPTY)
-				.updateIn([targetCoord.get('x'), targetCoord.get('y')], () => getSlotValue(board, srcCoord));
+	return board.update((slot: Slot) => {
+
+	});
 };
 
 const _getNextMoveHistory = (state: any, payload: any) => {
@@ -156,10 +162,10 @@ const _hasMaster = (board: any, piece: any) => {
 };
 
 const checkForWinner = (state: any) => {
-	const redWinner = !_hasMaster(state.get('board'), c.BLUE_MASTER);
-	const blueWinner = !_hasMaster(state.get('board'), c.RED_MASTER);
+	const redWinner = !_hasMaster(state.get('board'), Piece.BLUE_MASTER);
+	const blueWinner = !_hasMaster(state.get('board'), Piece.RED_MASTER);
 	if (blueWinner || redWinner) {
-		return state.set('winner', blueWinner ? c.BLUE : c.RED);
+		return state.set('winner', blueWinner ? Player.BLUE : Player.RED);
 	}
 
 	return state.set('winner', null);
@@ -190,7 +196,7 @@ const performMove = (state: any, payload: any) => {
  * @param {String} state application state Map.
  * @param {String} moveCard state property name of the move card to be exchanged.
  */
-const _swapMoveCard = (state: any, moveCard: string) => {
+const _swapMoveCard = (state: any, moveCard: number) => {
 	return Map({
 		[moveCard]: state.get('swapCard'),
 		swapCard: state.get(moveCard),
@@ -199,18 +205,18 @@ const _swapMoveCard = (state: any, moveCard: string) => {
 };
 
 const _swapMoveCard1 = (state: any) => {
-	if (state.get('activePlayer') === c.BLUE) {
-		return _swapMoveCard(state, c.BLUE_MOVE_CARD_1);
+	if (state.get('activePlayer') === Player.BLUE) {
+		return _swapMoveCard(state, MoveCards.BLUE_MOVE_CARD_1);
 	} else {
-		return _swapMoveCard(state, c.RED_MOVE_CARD_1);
+		return _swapMoveCard(state, MoveCards.RED_MOVE_CARD_1);
 	}
 };
 
 const _swapMoveCard2 = (state: any) => {
-	if (state.get('activePlayer') === c.BLUE) {
-		return _swapMoveCard(state, c.BLUE_MOVE_CARD_2);
+	if (state.get('activePlayer') === Player.BLUE) {
+		return _swapMoveCard(state, MoveCards.BLUE_MOVE_CARD_2);
 	} else {
-		return _swapMoveCard(state, c.RED_MOVE_CARD_2);
+		return _swapMoveCard(state, MoveCards.RED_MOVE_CARD_2);
 	}
 };
 
@@ -248,10 +254,7 @@ const resetGame = (state: any) => {
 
 export const DEFAULT_STATE = Map({
 	board: c.DEFAULT_BOARD,
-	capturedPieces: Map({
-		red: List([0, 0, 0, 0, 0]),
-		blue: List([0, 0, 0, 0, 0]),
-	}),
+	capturedPieces: c.DEFAULT_CAPTURED_PIECES,
 	swapCard: c.DEFAULT_CARD,
 	redMoveCard1: c.DEFAULT_CARD,
 	redMoveCard2: c.DEFAULT_CARD,
@@ -264,7 +267,7 @@ export const DEFAULT_STATE = Map({
 	winner: false,
 	isChoosingMoveCard: false,
 	isComputerMoveScheduled: false,
-	mode: c.MODE_HUMAN
+	mode: Mode.COMPUTER
 });
 
 const gameReducer = (state = DEFAULT_STATE, action: any) => {

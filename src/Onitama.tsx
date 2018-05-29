@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { Map } from 'immutable';
 import * as c from './constants/game-constants';
 import Card from './components/Card';
 import BoardSlot from './components/BoardSlot';
@@ -113,7 +112,6 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 									<BoardSlot
 										key={y}
 										slot={slot}
-										slotCoord={Map({x, y})}
 										actions={this.props.actions}
 									/>
 								))}

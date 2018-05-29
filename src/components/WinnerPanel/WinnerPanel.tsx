@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import * as c from '../../constants/game-constants';
+import { Player } from '../../typings';
 
 interface WinnerPanelProps {
 	winner: number;
@@ -39,7 +39,7 @@ const WinnerPanel: React.StatelessComponent<WinnerPanelProps> = ({actions, winne
 
 	return (
 		<Panel>
-			<Title>winner: {winner === c.BLUE ? 'blue won' : 'red won'}</Title>
+			<Title>winner: {winner === Player.BLUE ? 'blue won' : 'red won'}</Title>
 			<Button onClick={() => handleResetGame(actions)}>reset</Button>
 		</Panel>
 	);

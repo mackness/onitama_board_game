@@ -1,5 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
+import { Mode } from '../../typings';
 
 interface GameSettingsProps extends React.Props<GameSettingsProps> {
 	actions: any;
@@ -29,8 +30,8 @@ const navigate = (history: any, mode: any) => {
 const GameSettings: React.StatelessComponent<GameSettingsProps> = ({ actions, history }) => {
 	return (
 		<SettingsContainer>
-			<Button onClick={() => navigate(history, 'computer')}>computer</Button>
-			<Button onClick={() => navigate(history, 'human')}>human</Button>
+			<Button onClick={() => navigate(history, Mode.COMPUTER)}>computer</Button>
+			<Button onClick={() => navigate(history, Mode.HUMAN)}>human</Button>
 		</SettingsContainer>
 	);
 };

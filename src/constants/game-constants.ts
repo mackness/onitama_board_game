@@ -1,59 +1,77 @@
-import { Map, fromJS } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
+import { Piece, Player } from '../typings';
+import { sequenceBoard } from '../utils';
 
-// player values
-export const EMPTY: number = 0;
-export const RED: number = 100;
-export const BLUE: number = 200;
-export const RED_MASTER_VALUE: number = 150;
-export const BLUE_MASTER_VALUE: number = 250;
-
-// board pieces
+// board slots
 export const BLUE_PAWN: any = Map({
 	isCandidate: false,
 	isActive: false,
-	isMaster: false,
-	value: BLUE
+	piece: Map({
+		player: Player.BLUE,
+		piece: Piece.BLUE_PAWN
+	})
 });
+
 export const BLUE_MASTER: any = Map({
 	isCandidate: false,
 	isActive: false,
-	isMaster: false,
-	value: BLUE_MASTER_VALUE
+	piece: Map({
+		player: Player.BLUE,
+		piece: Piece.BLUE_MASTER
+	})
 });
+
 export const RED_PAWN: any = Map({
 	isCandidate: false,
 	isActive: false,
-	isMaster: false,
-	value: RED
+	piece: Map({
+		player: Player.RED,
+		piece: Piece.RED_PAWN
+	})
 });
+
 export const RED_MASTER: any = Map({
 	isCandidate: false,
 	isActive: false,
-	isMaster: false,
-	value: RED_MASTER_VALUE
+	piece: Map({
+		player: Player.RED,
+		piece: Piece.RED_MASTER
+	})
 });
+
 export const EMPTY_COORD: any = Map({
 	x: null,
 	y: null
 });
+
 export const EMPTY_SLOT: any = Map({
-	value: 0
+	isCandidate: false,
+	isActive: false,
+	piece: Map({
+		player: Piece.EMPTY,
+		piece: Piece.EMPTY
+	})
 });
-export const DEFAULT_BOARD: any = fromJS([
+
+export const DEFAULT_BOARD: any = sequenceBoard(fromJS([
 	[RED_PAWN, EMPTY_SLOT, EMPTY_SLOT, EMPTY_SLOT, BLUE_PAWN],
 	[RED_PAWN, EMPTY_SLOT, EMPTY_SLOT, EMPTY_SLOT, BLUE_PAWN],
 	[RED_MASTER, EMPTY_SLOT, EMPTY_SLOT, EMPTY_SLOT, BLUE_MASTER],
 	[RED_PAWN, EMPTY_SLOT, EMPTY_SLOT, EMPTY_SLOT, BLUE_PAWN],
 	[RED_PAWN, EMPTY_SLOT, EMPTY_SLOT, EMPTY_SLOT, BLUE_PAWN]
-]);
+]));
+
+export const DEFAULT_CAPTURED_PIECES: any = Map({
+	red: List([EMPTY_SLOT, EMPTY_SLOT, EMPTY_SLOT, EMPTY_SLOT, EMPTY_SLOT]),
+	blue: List([EMPTY_SLOT, EMPTY_SLOT, EMPTY_SLOT, EMPTY_SLOT, EMPTY_SLOT]),
+});
 
 // move cards
-export const MOVE: number = 300;
-export const START: number = 400;
 export const CENTER: any = Map({
 	x: 2,
 	y: 2
 });
+
 export const BLUE_MOVE_CARD_1: string = 'blueMoveCard1';
 export const BLUE_MOVE_CARD_2: string = 'blueMoveCard2';
 export const RED_MOVE_CARD_1: string = 'redMoveCard1';
@@ -61,7 +79,7 @@ export const RED_MOVE_CARD_2: string = 'redMoveCard2';
 export const SWAP_CARD: string = 'swapCard';
 export const DEFAULT_CARD: any = fromJS({
 	school: '',
-	cardColor: '',
+	color: '',
 	player: '',
 	card: [
 		[0, 0, 0, 0, 0],
@@ -71,7 +89,3 @@ export const DEFAULT_CARD: any = fromJS({
 		[0, 0, 0, 0, 0]
 	]
 });
-
-// modes
-export const MODE_HUMAN: string = 'human';
-export const MODE_COMPUTER: string = 'computer';
