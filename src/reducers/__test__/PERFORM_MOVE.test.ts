@@ -1,6 +1,6 @@
 import gameReducer from '../gameReducer';
 import { Map, List } from 'immutable';
-import { getSlotValue } from '../../utils';
+import { getSlotProperty } from '../../utils';
 import * as c from '../../constants/game-constants';
 import { Mode, Player } from '../../typings';
 import { PERFORM_MOVE } from '../../constants/action-constants';
@@ -48,10 +48,12 @@ test('game reducer', () => {
 			player: Player.BLUE
 		}));
 
-		// the target coordinates value to not be null
-		expect(getSlotValue(nextState.get('board'), Map({
+		const COORD = Map({
 			x: 3,
 			y: 3
-		}))).toBe(0);
+		});
+
+		// the target coordinates value to not be null
+		expect(getSlotProperty(nextState.get('board'), COORD, 'value')).toBe(0);
 	});
 });

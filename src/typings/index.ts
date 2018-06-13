@@ -20,11 +20,11 @@ export enum Mode {
 }
 
 export enum MoveCards {
-	SWAP_CARD,
-	BLUE_MOVE_CARD_1,
-	BLUE_MOVE_CARD_2,
-	RED_MOVE_CARD_1,
-	RED_MOVE_CARD_2
+	SWAP_CARD = 'swapCard',
+	BLUE_MOVE_CARD_1 = 'blueMoveCard1',
+	BLUE_MOVE_CARD_2 = 'blueMoveCard2',
+	RED_MOVE_CARD_1 = 'redMoveCard1',
+	RED_MOVE_CARD_2 = 'redMoveCard2'
 }
 
 export enum MoveCard {
@@ -53,19 +53,16 @@ export interface Card {
 	card: Board;
 }
 
-export interface ApplicationState {
-	board?: Board;
-	swapCard?: Card;
-	redMoveCard1?: Card;
-	redMoveCard2?: Card;
-	blueMoveCard1?: Card;
-	blueMoveCard2?: Card;
-	activeSlotCoord?: Coord;
-	candidateCoords?: Coord;
-	activePlayer?: number;
-	moveHistory?: List<ImmutableMap<string|number>>;
-	isChoosingMoveCard?: boolean;
-	get: Function;
-	set: Function;
-	merge: Function;
-}
+// declare type ApplicationState = ImmutableMap<{
+// 	board?: Board;
+// 	swapCard?: Card;
+// 	redMoveCard1?: Card;
+// 	redMoveCard2?: Card;
+// 	blueMoveCard1?: Card;
+// 	blueMoveCard2?: Card;
+// 	activeSlotCoord?: Coord;
+// 	candidateCoords?: Coord;
+// 	activePlayer?: number;
+// 	moveHistory?: List<ImmutableMap<string|number>>;
+// 	isChoosingMoveCard?: boolean;
+// }>;

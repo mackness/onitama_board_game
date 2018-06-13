@@ -1,12 +1,12 @@
 import { Map, List } from 'immutable';
 import * as c from '../constants/game-constants';
 import { MoveCard } from '../typings';
-import { Board, Coord, Player, Piece, Slot } from '../typings';
+import { Board, Coord, Player } from '../typings';
 
 /**
  * Gets the value of a given slot properties.
  * @param {Board} board - a 2d matrix of Immutable Lists.
- * @param {Map} coords -h a Map of x y coordinates.
+ * @param {Map} coords - a Map of x y coordinates.
  */
 export function getSlotProperty(board: Board, coord: Coord, property: string): any  {
 	const slot = board.getIn([coord.get('x'), coord.get('y')]);
@@ -14,8 +14,8 @@ export function getSlotProperty(board: Board, coord: Coord, property: string): a
 }
 
 /**
- * Gets the value of a given slot.
- * @param {List} board - a 2d matrix of Immutable Lists.
+ * Gets the value of a given slot properties.
+ * @param {Board} board - a 2d matrix of Immutable Lists.
  * @param {Map} coords - a Map of x y coordinates.
  */
 export function getPieceProperty(board: Board, coord: Coord, property: string): any  {
@@ -25,18 +25,17 @@ export function getPieceProperty(board: Board, coord: Coord, property: string): 
 
 /**
  * Get the absolute coords for all possible moves on a move card.
- * note: the absolute coordinate list will only contain in bounds coordinates
  * @param {List} card - a 5x5 matrix representing a move card.
  */
 export function getAbsoluteCoords(card: any) {
-	let absCoords = [];
-	for (var x = 0; x < card.size; x++) {
-		for (var y = 0; y < card.get(x).size; y++) {
-			if (card.getIn([x, y]) !== MoveCard.EMPTY && card.getIn([x, y]) !== MoveCard.START) {
+	let absCoords: any[] = [];
+	card.forEach((row: any, x: number) => {
+		row.forEach((slot: any, y: number) => {
+			if (slot !== MoveCard.EMPTY && slot !== MoveCard.START) {
 				absCoords.push(Map({x, y}));
 			}
-		}
-	}
+		});
+	});
 	return absCoords;
 }
 
@@ -45,14 +44,14 @@ export function getAbsoluteCoords(card: any) {
  * @return {List} a list of coordinates of all active board pieces.
  */
 export function getSourceCoords(board: any, player: any) {
-	let sourceCoords = [];
-	for (var x = 0; x < board.size; x++) {
-		for (var y = 0; y < board.get(x).size; y++) {
-			if (board.getIn([x, y]) === player) {
+	let sourceCoords: any[] = [];
+	board.forEach((row: any, x: number) => {
+		row.forEach((slot: any, y: number) => {
+			if (slot.getIn(['piece', 'player']) === player) {
 				sourceCoords.push(Map({x, y}));
 			}
-		}
-	}
+		});
+	});
 	return sourceCoords;
 }
 
@@ -63,8 +62,8 @@ export function getSourceCoords(board: any, player: any) {
  */
 export function getRelativeCoord(a: Coord, b: Coord) {
 	return Map({
-		x: a.get('x') - b.get('x'),
-		y: a.get('y') - b.get('y')
+		x: b.get('x') - a.get('x'),
+		y: b.get('y') - a.get('y')
 	});
 }
 
@@ -147,10 +146,10 @@ export function getCandidateCoords(state: any, acoord: any) {
 		});
 	}).filter((coord: any) => {
 		return (
-			(coord.get('x') >= 0 && coord.get('x') <= board.size) &&
-			(coord.get('y') >= 0 && coord.get('y') <= board.size) &&
+			(coord.get('x') >= 0 && coord.get('x') <= board.size - 1) &&
+			(coord.get('y') >= 0 && coord.get('y') <= board.size - 1) &&
 			(isOpponentSlot(activePlayer, board, coord) ||
-			getSlotProperty(board, coord, '').getIn(['piece', 'piece']) === Piece.EMPTY)
+			getPieceProperty(board, coord, 'player') !== activePlayer)
 		);
 	});
 }
@@ -182,8 +181,9 @@ export function relativeCoordSearch(moveCoords: Coord, cardCoords: any) {
  * @return {boolean} is opponent slot
  */
 export function isOpponentSlot(activePlayer: number, board: any, coord: any): boolean {
-	const slot = getSlotValue(board, coord);
-	return activePlayer !== slot.getIn(['piece', 'player']);
+	const piece = getPieceProperty(board, coord, 'player');
+	const opponent = activePlayer === Player.BLUE ? Player.RED : Player.BLUE;
+	return piece === opponent;
 }
 
 /**
@@ -199,7 +199,7 @@ export function getRandomInt(min: number, max: number): number {
 
 /**
  * applies x and y coordiates to board slots when game is initialized
- * @param {Board} board board data structure
+ * @param {Board} board data structure
  * @return {Board} the game board
  */
 export function sequenceBoard(board: any): Board {

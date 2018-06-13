@@ -23,7 +23,7 @@ export default class Ai {
 	}
 
 	/**
-	 * This method constructs a move by randomly selecting source and target move coords.
+	 * This method constructs a move by randomly selecting source and target move slots.
 	 * @return {Map} a map of all the data necessary to make a move.
 	 */
 	public makeBlindMove = () => {
@@ -40,9 +40,9 @@ export default class Ai {
 
 		return fromJS({
 			moveCard: this.selectMoveCard(srcCoord, targetCoord),
-			coords: {
-				src: srcCoord,
-				target: targetCoord
+			slots: {
+				source: board.getIn([srcCoord.get('x'), srcCoord.get('y')]),
+				target: board.getIn([targetCoord.get('x'), targetCoord.get('y')])
 			}
 		});
 	}
@@ -53,14 +53,14 @@ export default class Ai {
 		const moveCard1RelativeCoords = getRelativeCoordsByMoveCard(moveCards.get(0));
 		const moveCard2RelativeCoords = getRelativeCoordsByMoveCard(moveCards.get(1));
 
-		const moveCard1SearchResults = relativeCoordSearch(relativeCoord, moveCard1RelativeCoords);
-		const moveCard2SearchResults = relativeCoordSearch(relativeCoord, moveCard2RelativeCoords);
+		const card1Results = relativeCoordSearch(relativeCoord, moveCard1RelativeCoords);
+		const card2Results = relativeCoordSearch(relativeCoord, moveCard2RelativeCoords);
 
-		if (moveCard1SearchResults && moveCard2SearchResults) {
+		if (card1Results && card2Results) {
 			this.actions.gameActions.handleMoveCardExchange(c.RED_MOVE_CARD_1);
-		} else if (moveCard1SearchResults) {
+		} else if (card1Results) {
 			this.actions.gameActions.handleMoveCardExchange(c.RED_MOVE_CARD_1);
-		} else if (moveCard2SearchResults) {
+		} else if (card2Results) {
 			this.actions.gameActions.handleMoveCardExchange(c.RED_MOVE_CARD_2);
 		} else {
 			throw new Error('noOP, both move card coords did not match last move coords');

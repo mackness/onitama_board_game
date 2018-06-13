@@ -46,12 +46,13 @@ export default class GameActions {
 			});
 	}
 
-	handleSlotInteraction(coord: any) {
+	handleSlotInteraction(slot: any) {
 		const board = this.store.getState().game.get('board');
+		const coord = slot.get('coord');
 		if (getPieceProperty(board, coord, 'piece') !== Piece.EMPTY) {
 			this.store.dispatch({
 				type: SLOT_INTERACTION,
-				payload: { coord }
+				payload: { slot }
 			});
 		}
 	}
@@ -62,21 +63,19 @@ export default class GameActions {
 		this.store.dispatch({
 			type: PERFORM_MOVE,
 			payload: {
-				srcCoord: move.getIn(['coords', 'src']),
-				targetCoord: move.getIn(['coords', 'target'])
+				sourceSlot: move.getIn(['slot', 'source']),
+				targetSlot: move.getIn(['slot', 'target'])
 			}
 		});
 	}
 
-	performPlayerMove(coords: any) {
+	performPlayerMove(slots: any) {
 		return new Promise((resolve, reject) => {
 			try {
+				const { sourceSlot, targetSlot } = slots;
 				this.store.dispatch({
 					type: PERFORM_MOVE,
-					payload: {
-						srcCoord: coords.srcCoord,
-						targetCoord: coords.targetCoord
-					}
+					payload: { sourceSlot, targetSlot }
 				});
 				resolve();
 			} catch (error) {
@@ -94,14 +93,14 @@ export default class GameActions {
 		);
 	}
 
-	handleCandidateSlotInteraction(coords: any) {
-		this.performPlayerMove(coords).then(() => {
+	handleCandidateSlotInteraction(slots: any) {
+		this.performPlayerMove(slots).then(() => {
 			this.handleMoveCardExchange();
 			if (this._shouldPerformComputerMove()) {
 				this.performComputerMove();
 			}
-		}).catch(() => {
-			// log move error
+		}).catch((error) => {
+			return error;
 		});
 
 		this.store.dispatch({

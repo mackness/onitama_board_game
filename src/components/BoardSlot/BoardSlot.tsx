@@ -6,7 +6,7 @@ import PieceFactory from '../PieceFactory';
 
 interface BoardSlotProps extends React.Props<BoardSlot> {
 	actions: any;
-	activeSlotCoord: any;
+	activeSlot: any;
 	activePlayer: number;
 	board: Board;
 	candidateCoords: any;
@@ -47,19 +47,19 @@ class BoardSlot extends React.Component<BoardSlotProps, BoardSlotState> {
 		this.state = {};
 	}
 
-	_handleSlotInteraction = () => {
-		let { activePlayer, coord, player } = this.props;
+	_slotInteraction = () => {
+		let { activePlayer, slot, player } = this.props;
 		if (activePlayer === player) {
-			this.props.actions.gameActions.handleSlotInteraction(coord);
+			this.props.actions.gameActions.handleSlotInteraction(slot);
 		}
 	}
 
-	_handleCandidateSlotInteraction  = (event: any) => {
-		let { activePlayer, coord, player, activeSlotCoord } = this.props;
+	_candidateSlotInteraction  = (event: any) => {
+		let { activePlayer, slot, player, activeSlot } = this.props;
 		if (activePlayer !== player) {
 			this.props.actions.gameActions.handleCandidateSlotInteraction({
-				srcCoord: activeSlotCoord,
-				targetCoord: coord
+				sourceSlot: activeSlot,
+				targetSlot: slot
 			});
 		}
 	}
@@ -78,13 +78,13 @@ class BoardSlot extends React.Component<BoardSlotProps, BoardSlotState> {
 			);
 		} else if (slot.get('isCandidate')) {
 			return (
-				<CandidateSlot onClick={this._handleSlotInteraction} theme={theme}>
+				<CandidateSlot onClick={this._candidateSlotInteraction} theme={theme}>
 					<PieceFactory piece={piece} size='large' />
 				</CandidateSlot>
 			);
 		} else {
 			return (
-				<Slot onClick={this._handleSlotInteraction} theme={theme}>
+				<Slot onClick={this._slotInteraction} theme={theme}>
 					<PieceFactory piece={piece} size='large' />
 				</Slot>
 			);
@@ -95,8 +95,7 @@ class BoardSlot extends React.Component<BoardSlotProps, BoardSlotState> {
 const mapStateToProps = (state: any, props: any) => {
 	return {
 		activePlayer: state.game.get('activePlayer'),
-		activeSlotCoord: state.game.get('activeSlotCoord'),
-		coord: props.slot.get('coord'),
+		activeSlot: state.game.get('activeSlot'),
 		player: props.slot.getIn(['piece', 'player']),
 		piece: props.slot.getIn(['piece', 'piece'])
 	};

@@ -33,11 +33,13 @@ const Board = styled.div`
 	display: flex;
 	justify-content: space-around;
 	margin-right: 20px;
-	overflow: hidden;
 `;
 
 const Column = styled.div`
 	border-right: solid 1px #000;
+	&:last-child {
+		border: 0;
+	}
 `;
 
 const FlexColumn = styled.div`
@@ -83,12 +85,8 @@ class Onitama extends React.Component<OnitamaProps, OnitamaState> {
 
 	render() {
 		const {
-			blueMoveCard1,
-			blueMoveCard2,
-			board,
-			redMoveCard1,
-			redMoveCard2,
-			swapCard
+			blueMoveCard1, blueMoveCard2, board,
+			redMoveCard1, redMoveCard2, swapCard
 		} = this.props;
 		return (
 			<div>
