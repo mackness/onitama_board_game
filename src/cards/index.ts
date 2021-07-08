@@ -1,194 +1,194 @@
-import c from '../constants/game-constants';
+import { Piece, MoveCard } from '../typings';
 
 export default [
 	{
 		school: 'goose',
-		color: 'blue',
-		player: c.BLUE,
+		color: '#6a7f9a',
+		piece: Piece.BLUE_PAWN,
 		card: [
 			[0, 0, 0, 0, 0],
-			[0, c.MOVE, c.MOVE, 0, 0],
-			[0, 0, c.START, 0, 0],
-			[0, 0, c.MOVE, c.MOVE, 0],
+			[0, MoveCard.MOVE, MoveCard.MOVE, 0, 0],
+			[0, 0, MoveCard.START, 0, 0],
+			[0, 0, MoveCard.MOVE, MoveCard.MOVE, 0],
 			[0, 0, 0, 0, 0]
 		]
 	},
 	{
 		school: 'frog',
-		color: 'blue',
-		player: c.RED,
+		color: '#6a7f9a',
+		piece: Piece.RED_PAWN,
 		card: [
-			[0, 0, c.MOVE, 0, 0],
-			[0, 0, 0, c.MOVE, 0],
-			[0, 0, c.START, 0, 0],
-			[0, 0, 0, c.MOVE, 0],
+			[0, 0, MoveCard.MOVE, 0, 0],
+			[0, 0, 0, MoveCard.MOVE, 0],
+			[0, 0, MoveCard.START, 0, 0],
+			[0, 0, 0, MoveCard.MOVE, 0],
 			[0, 0, 0, 0, 0]
 		]
 	},
 	{
 		school: 'eel',
-		color: 'blue',
-		player: c.BLUE,
+		color: '#6a7f9a',
+		piece: Piece.BLUE_PAWN,
 		card: [
 			[0, 0, 0, 0, 0],
-			[0, c.MOVE, 0, c.MOVE, 0],
-			[0, 0, c.START, 0, 0],
-			[0, 0, c.MOVE, 0, 0],
+			[0, MoveCard.MOVE, 0, MoveCard.MOVE, 0],
+			[0, 0, MoveCard.START, 0, 0],
+			[0, 0, MoveCard.MOVE, 0, 0],
 			[0, 0, 0, 0, 0]
 		]
 	},
 	{
 		school: 'horse',
-		color: 'blue',
-		player: c.RED,
+		color: '#6a7f9a',
+		piece: Piece.RED_PAWN,
 		card: [
 			[0, 0, 0, 0, 0],
-			[0, 0, c.MOVE, 0, 0],
-			[0, c.MOVE, c.START, c.MOVE, 0],
+			[0, 0, MoveCard.MOVE, 0, 0],
+			[0, MoveCard.MOVE, MoveCard.START, MoveCard.MOVE, 0],
 			[0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0]
 		]
 	},
 	{
 		school: 'boar',
-		color: 'green',
-		player: c.RED,
+		color: '#848877',
+		piece: Piece.RED_PAWN,
 		card: [
 			[0, 0, 0, 0, 0],
-			[0, 0, c.MOVE, 0, 0],
-			[0, c.MOVE, c.START, c.MOVE, 0],
+			[0, 0, MoveCard.MOVE, 0, 0],
+			[0, MoveCard.MOVE, MoveCard.START, MoveCard.MOVE, 0],
 			[0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0]
 		]
 	},
 	{
 		school: 'mantis',
-		color: 'green',
-		player: c.RED,
+		color: '#848877',
+		piece: Piece.RED_PAWN,
 		card: [
 			[0, 0, 0, 0, 0],
-			[0, c.MOVE, 0, 0, 0],
-			[0, 0, c.START, c.MOVE, 0],
-			[0, c.MOVE, 0, 0, 0],
+			[0, MoveCard.MOVE, 0, 0, 0],
+			[0, 0, MoveCard.START, MoveCard.MOVE, 0],
+			[0, MoveCard.MOVE, 0, 0, 0],
 			[0, 0, 0, 0, 0]
 		]
 	},
 	{
 		school: 'crab',
-		color: 'green',
-		player: c.BLUE,
+		color: '#848877',
+		piece: Piece.BLUE_PAWN,
 		card: [
 			[0, 0, 0, 0, 0],
-			[0, 0, c.MOVE, 0, 0],
-			[c.MOVE, 0, c.START, 0, c.MOVE],
+			[0, 0, MoveCard.MOVE, 0, 0],
+			[MoveCard.MOVE, 0, MoveCard.START, 0, MoveCard.MOVE],
 			[0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0]
 		]
 	},
 	{
 		school: 'dragon',
-		color: 'green',
-		player: c.RED,
+		color: '#848877',
+		piece: Piece.RED_PAWN,
 		card: [
 			[0, 0, 0, 0, 0],
-			[c.MOVE, 0, 0, 0, c.MOVE],
-			[0, 0, c.START, 0, 0],
-			[0, c.MOVE, 0, c.MOVE, 0],
+			[MoveCard.MOVE, 0, 0, 0, MoveCard.MOVE],
+			[0, 0, MoveCard.START, 0, 0],
+			[0, MoveCard.MOVE, 0, MoveCard.MOVE, 0],
 			[0, 0, 0, 0, 0]
 		]
 	},
 	{
 		school: 'cobra',
-		color: 'red',
-		player: c.RED,
+		color: '#915958',
+		piece: Piece.RED_PAWN,
 		card: [
 			[0, 0, 0, 0, 0],
-			[0, 0, c.MOVE, 0, 0],
-			[0, 0, c.START, 0, 0],
-			[0, c.MOVE, 0, c.MOVE, 0],
+			[0, 0, MoveCard.MOVE, 0, 0],
+			[0, 0, MoveCard.START, 0, 0],
+			[0, MoveCard.MOVE, 0, MoveCard.MOVE, 0],
 			[0, 0, 0, 0, 0]
 		]
 	},
 	{
 		school: 'ox',
-		color: 'red',
-		player: c.BLUE,
+		color: '#915958',
+		piece: Piece.BLUE_PAWN,
 		card: [
 			[0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0],
-			[0, c.MOVE, c.START, c.MOVE, 0],
-			[0, 0, c.MOVE, 0, 0],
+			[0, MoveCard.MOVE, MoveCard.START, MoveCard.MOVE, 0],
+			[0, 0, MoveCard.MOVE, 0, 0],
 			[0, 0, 0, 0, 0]
 		]
 	},
 	{
 		school: 'rooster',
-		color: 'red',
-		player: c.RED,
+		color: '#915958',
+		piece: Piece.RED_PAWN,
 		card: [
 			[0, 0, 0, 0, 0],
-			[0, 0, c.MOVE, c.MOVE, 0],
-			[0, 0, c.START, 0, 0],
-			[0, c.MOVE, c.MOVE, 0, 0],
+			[0, 0, MoveCard.MOVE, MoveCard.MOVE, 0],
+			[0, 0, MoveCard.START, 0, 0],
+			[0, MoveCard.MOVE, MoveCard.MOVE, 0, 0],
 			[0, 0, 0, 0, 0]
 		]
 	},
 	{
 		school: 'rabbit',
-		color: 'red',
-		player: c.BLUE,
+		color: '#915958',
+		piece: Piece.BLUE_PAWN,
 		card: [
 			[0, 0, 0, 0, 0],
-			[0, 0, 0, c.MOVE, 0],
-			[0, 0, c.START, 0, 0],
-			[0, c.MOVE, 0, 0, 0],
-			[0, 0, c.MOVE, 0, 0]
+			[0, 0, 0, MoveCard.MOVE, 0],
+			[0, 0, MoveCard.START, 0, 0],
+			[0, MoveCard.MOVE, 0, 0, 0],
+			[0, 0, MoveCard.MOVE, 0, 0]
 		]
 	},
 	{
 		school: 'crane',
-		color: 'dark-green',
-		player: c.BLUE,
+		color: '#6a6d60',
+		piece: Piece.BLUE_PAWN,
 		card: [
 			[0, 0, 0, 0, 0],
-			[0, 0, 0, c.MOVE, 0],
-			[0, c.MOVE, c.START, 0, 0],
-			[0, 0, 0, c.MOVE, 0],
+			[0, 0, 0, MoveCard.MOVE, 0],
+			[0, MoveCard.MOVE, MoveCard.START, 0, 0],
+			[0, 0, 0, MoveCard.MOVE, 0],
 			[0, 0, 0, 0, 0]
 		]
 	},
 	{
 		school: 'monkey',
-		color: 'dark-green',
-		player: c.BLUE,
+		color: '#6a6d60',
+		piece: Piece.BLUE_PAWN,
 		card: [
 			[0, 0, 0, 0, 0],
-			[0, c.MOVE, 0, c.MOVE, 0],
-			[0, 0, c.START, 0, 0],
-			[0, c.MOVE, 0, c.MOVE, 0],
+			[0, MoveCard.MOVE, 0, MoveCard.MOVE, 0],
+			[0, 0, MoveCard.START, 0, 0],
+			[0, MoveCard.MOVE, 0, MoveCard.MOVE, 0],
 			[0, 0, 0, 0, 0]
 		]
 	},
 	{
 		school: 'elephant',
-		color: 'dark-green',
-		player: c.RED,
+		color: '#6a6d60',
+		piece: Piece.RED_PAWN,
 		card: [
 			[0, 0, 0, 0, 0],
-			[0, c.MOVE, c.MOVE, 0, 0],
-			[0, 0, c.START, 0, 0],
-			[0, c.MOVE, c.MOVE, 0, 0],
+			[0, MoveCard.MOVE, MoveCard.MOVE, 0, 0],
+			[0, 0, MoveCard.START, 0, 0],
+			[0, MoveCard.MOVE, MoveCard.MOVE, 0, 0],
 			[0, 0, 0, 0, 0]
 		]
 	},
 	{
 		school: 'tiger',
-		color: 'dark-green',
-		player: c.RED,
+		color: '#6a6d60',
+		piece: Piece.RED_PAWN,
 		card: [
 			[0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0],
-			[c.MOVE, 0, c.START, c.MOVE, 0],
+			[MoveCard.MOVE, 0, MoveCard.START, MoveCard.MOVE, 0],
 			[0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0]
 		]

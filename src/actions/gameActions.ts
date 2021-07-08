@@ -1,5 +1,5 @@
-import { getSlotValue } from '../utils';
-import c from '../constants/game-constants';
+import { getPieceProperty } from '../utils';
+import { Mode, Player, Piece } from '../typings';
 import {
 	INITIAL_GAME_STATE,
 	SLOT_INTERACTION,
@@ -36,8 +36,8 @@ export default class GameActions {
 	setupInitialGameState(mode: string) {
 		this.initGame(mode)
 			.then((state: any) => {
-				if (state.get('activePlayer') === c.RED &&
-					state.get('mode') === c.MODE_COMPUTER) {
+				if (state.get('activePlayer') === Player.RED &&
+					state.get('mode') === Mode.COMPUTER) {
 					this.performComputerMove();
 				}
 			})
@@ -46,12 +46,13 @@ export default class GameActions {
 			});
 	}
 
-	handleSlotInteraction(coord: any) {
+	handleSlotInteraction(slot: any) {
 		const board = this.store.getState().game.get('board');
-		if (getSlotValue(board, coord) !== c.EMPTY) {
+		const coord = slot.get('coord');
+		if (getPieceProperty(board, coord, 'piece') !== Piece.EMPTY) {
 			this.store.dispatch({
 				type: SLOT_INTERACTION,
-				payload: { coord }
+				payload: { slot }
 			});
 		}
 	}
@@ -62,48 +63,74 @@ export default class GameActions {
 		this.store.dispatch({
 			type: PERFORM_MOVE,
 			payload: {
-				srcCoord: move.getIn(['coords', 'src']),
-				targetCoord: move.getIn(['coords', 'target'])
+				sourceSlot: move.getIn(['slot', 'source']),
+				targetSlot: move.getIn(['slot', 'target'])
 			}
 		});
 	}
 
-	performPlayerMove(coords: any) {
+	performPlayerMove(slots: any) {
 		return new Promise((resolve, reject) => {
-			this.store.dispatch({
-				type: PERFORM_MOVE,
-				payload: {
-					srcCoord: coords.srcCoord,
-					targetCoord: coords.targetCoord
-				}
-			});
-			resolve();
+			try {
+				const { sourceSlot, targetSlot } = slots;
+				this.store.dispatch({
+					type: PERFORM_MOVE,
+					payload: { sourceSlot, targetSlot }
+				});
+				resolve();
+			} catch (error) {
+				reject(error);
+			}
 		});
 	}
 
-	handleCandidateSlotInteraction(coords: any) {
+	_shouldPerformComputerMove() {
 		const state = this.store.getState().game;
+		return (
+			!state.get('winner') &&
+			!state.get('isChoosingMoveCard') &&
+			state.get('mode') === Mode.COMPUTER
+		);
+	}
 
-		this.performPlayerMove(coords).then(() => {
-			if (!state.get('winner') &&
-				state.get('mode') === c.MODE_COMPUTER) {
+	handleCandidateSlotInteraction(slots: any) {
+		this.performPlayerMove(slots).then(() => {
+			this.handleMoveCardExchange();
+			if (this._shouldPerformComputerMove()) {
 				this.performComputerMove();
 			}
+		}).catch((error) => {
+			return error;
 		});
-
-		this.handleMoveCardExchange();
 
 		this.store.dispatch({
 			type: CHECK_FOR_WINNER
 		});
 	}
 
+	/**
+	 * Manages the exchange of move cards.
+	 * rules: if a move card is provided to this function then the reducer
+	 * will exchange the provided card with the swap card. If a move card is not provided
+	 * the reducer will attempt an auto move card exchange. if the auto move card echange fails
+	 * the user will be asked to explicitly choose a move card.
+	 * @param {String} moveCard - a move card id
+	 */
 	handleMoveCardExchange(moveCard?: any) {
+		const state = this.store.getState().game;
+		const mode = state.get('mode');
+		const activePlayer = state.get('activePlayer');
 		if (moveCard) {
 			this.store.dispatch({
 				type: MOVE_CARD_EXCHANGE,
 				payload: { moveCard }
 			});
+
+			// a computer move needs to be performed after the human player has
+			// chosen a move card
+			if (mode === Mode.COMPUTER && activePlayer === Player.BLUE) {
+				this.performComputerMove();
+			}
 		} else {
 			this.store.dispatch({
 				type: AUTO_MOVE_CARD_EXCHANGE

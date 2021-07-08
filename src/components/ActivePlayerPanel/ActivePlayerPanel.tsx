@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import Piece from '../Piece';
+import { Player, Piece } from '../../typings';
+import PieceFactory from '../PieceFactory';
 
 interface CapturedPiecesProps  {
 	activePlayer: number;
@@ -15,11 +16,19 @@ const Label = styled.span`
 	margin-right: 5px;
 `;
 
+const _getPieceType = (activePlayer: number): any => {
+	if (activePlayer === Player.BLUE) {
+		return Piece.BLUE_PAWN;
+	} else {
+		return Piece.RED_PAWN;
+	}
+};
+
 const ActivePlayerPanel: React.StatelessComponent<CapturedPiecesProps> = ({activePlayer}) => {
 	return (
 		<FlexRow>
 			<Label>Turn:</Label>
-			<Piece color={activePlayer} size='small' />
+			<PieceFactory piece={_getPieceType(activePlayer)} size='small' />
 		</FlexRow>
 	);
 };

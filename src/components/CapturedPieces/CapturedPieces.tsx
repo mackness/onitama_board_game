@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import Peice from '../Piece';
+import PieceFactory from '../PieceFactory';
+import { Slot, Player } from '../../typings';
 
 interface CapturedPiecesProps  {
 	capturedPieces: any;
@@ -15,23 +16,40 @@ const Label = styled.span`
 	margin-right: 5px;
 `;
 
-const _renderPiece = (value: number, i: number) => (
-	<Peice
-		key={i}
-		color={value}
-		size='small'
-	/>
-);
+const _getBackgroundColor = (slot: Slot): string => {
+	const player = slot.getIn(['piece', 'player']);
+	if (player === Player.BLUE) {
+		return '#69a1b0';
+	} else if (player === Player.RED) {
+		return '#fe5a59';
+	} else {
+		return '#ccc';
+	}
+};
+
+const _renderPiece = (slot: any, i: number): JSX.Element =>  {
+	return (
+		<PieceFactory
+			key={i}
+			style={{
+				margin: ' 0 5px 0 0',
+				backgroundColor: _getBackgroundColor(slot)
+			}}
+			piece={slot.get('piece')}
+			size='small'
+		/>
+	);
+};
 
 const CapturedPieces: React.StatelessComponent<CapturedPiecesProps> = ({capturedPieces}) => {
 	return (
 		<div>
 			<FlexRow>
-				<Label>player 1:</Label>
+				<Label>blue player:</Label>
 				{capturedPieces.get('blue').map(_renderPiece)}
 			</FlexRow>
 			<FlexRow>
-				<Label>player 2:</Label>
+				<Label>red player:</Label>
 				{capturedPieces.get('red').map(_renderPiece)}
 			</FlexRow>
 		</div>

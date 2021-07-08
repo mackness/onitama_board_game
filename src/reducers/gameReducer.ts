@@ -1,7 +1,7 @@
 import { List, Map, fromJS } from 'immutable';
-import { Coord } from '../typings';
+import { Coord, Mode, Piece, Player, MoveCards } from '../typings';
 import cards from '../cards';
-import c from '../constants/game-constants';
+import * as c from '../constants/game-constants';
 
 import {
 	INITIAL_GAME_STATE,
@@ -17,7 +17,6 @@ import {
 	shuffle,
 	isOpponentSlot,
 	getRelativeCoord,
-	getSlotValue,
 	relativeCoordSearch,
 	toggleActivePlayer,
 	getMoveCards,
@@ -25,86 +24,96 @@ import {
 	getRelativeCoordsByMoveCard
 } from '../utils';
 
-export const DEFAULT_STATE = Map({
-	board: fromJS([
-		[c.RED, 0, 0, 0, c.BLUE],
-		[c.RED, 0, 0, 0, c.BLUE],
-		[c.RED_MASTER, 0, 0, 0, c.BLUE_MASTER],
-		[c.RED, 0, 0, 0, c.BLUE],
-		[c.RED, 0, 0, 0, c.BLUE]
-	]),
-	capturedPieces: Map({
-		red: List([0, 0, 0, 0, 0]),
-		blue: List([0, 0, 0, 0, 0]),
-	}),
-	swapCard: c.DEFAULT_CARD,
-	redMoveCard1: c.DEFAULT_CARD,
-	redMoveCard2: c.DEFAULT_CARD,
-	blueMoveCard1: c.DEFAULT_CARD,
-	blueMoveCard2: c.DEFAULT_CARD,
-	activeSlotCoord: c.EMPTY_COORD,
-	candidateCoords: List(),
-	activePlayer: null,
-	moveHistory: List(),
-	winner: null,
-	isChoosingMoveCard: false,
-	mode: c.MODE_HUMAN
-});
-
 const getInitialGameState = (state: any, payload?: any) => {
 	const shuffledCards = fromJS(shuffle(cards));
+	const swapCardPiece =  shuffledCards.getIn([0, 'piece']);
 	const nextState = Map({
-		winner: null,
-		board: fromJS([
-			[c.RED, 0, 0, 0, c.BLUE],
-			[c.RED, 0, 0, 0, c.BLUE],
-			[c.RED_MASTER, 0, 0, 0, c.BLUE_MASTER],
-			[c.RED, 0, 0, 0, c.BLUE],
-			[c.RED, 0, 0, 0, c.BLUE]
-		]),
-		capturedPieces: Map({
-			red: List([0, 0, 0, 0, 0]),
-			blue: List([0, 0, 0, 0, 0])
-		}),
+		winner: false,
+		board: c.DEFAULT_BOARD,
+		capturedPieces: c.DEFAULT_CAPTURED_PIECES,
 		swapCard: shuffledCards.get(0),
 		blueMoveCard1: shuffledCards.get(1),
 		blueMoveCard2: shuffledCards.get(2),
 		redMoveCard1: shuffledCards.get(3),
 		redMoveCard2: shuffledCards.get(4),
-		activePlayer: shuffledCards.getIn([0, 'player']),
-		mode: (payload && payload.mode === c.MODE_HUMAN) ? c.MODE_HUMAN : c.MODE_COMPUTER
+		activePlayer: swapCardPiece === Piece.RED_PAWN ? Player.RED : Player.BLUE,
+		mode: (payload && payload.mode === Mode.HUMAN) ? Mode.HUMAN : Mode.COMPUTER
 	});
 
 	return state.merge(nextState);
+};
+
+const _isCandidateSlot = (slot: any, candidateCoords: any): boolean => {
+	let m = fromJS(candidateCoords);
+	return m.contains(slot.get('coord'));
+};
+
+const _isActiveSlot = (slot: any, activeCoord: any): boolean => {
+	return activeCoord.equals(slot.get('coord'));
+};
+
+/**
+ * based on given inputs this function should apply the next board state to the board structure
+ * @param {Map} state application state Map.
+ * @param {Object} coord coordinate object from action payload.
+ */
+const _applyCandidateCoordsToBoard = (state: any, sourceSlot: any) => {
+	const board = state.get('board');
+	const coord = sourceSlot.get('coord');
+	const candidateCoords = getCandidateCoords(state, coord);
+
+	return board.map((col: any, x: number) => {
+		return col.map((slot: any, y: number) => {
+			switch (true) {
+				case _isCandidateSlot(slot, candidateCoords) && _isActiveSlot(slot, coord):
+					return slot.merge({
+						isCandidate: true,
+						isActive: true
+					});
+				case _isCandidateSlot(slot, candidateCoords):
+					return slot.merge({
+						isCandidate: true,
+						isActive: false
+					});
+				case _isActiveSlot(slot, coord):
+					return slot.merge({
+						isCandidate: false,
+						isActive: true
+					});
+				default:
+					return slot.merge({
+						isCandidate: false,
+						isActive: false
+					});
+			}
+		});
+	});
 };
 
 const handleSlotInteraction = (state: any, payload: any) => {
-	const nextState = Map({
-		candidateCoords: getCandidateCoords(state, payload.coord),
-		activeSlotCoord: Map(payload.coord)
-	});
-
-	return state.merge(nextState);
+	const { slot } = payload;
+	return state.merge(Map ({
+		board: _applyCandidateCoordsToBoard(state, slot),
+		activeSlot: slot
+	}));
 };
 
 const _getNextCapturedPieces = (state: any, coord: Coord) => {
-	let updated = false;
 	const board = state.get('board');
 	const activePlayer = state.get('activePlayer');
-	const activePlayerKey = activePlayer === c.BLUE ? 'blue' : 'red';
+	const activePlayerKey = activePlayer === Player.BLUE ? 'blue' : 'red';
+	const capturedSize = state.getIn(['capturedPieces', activePlayerKey]).reduce((acc: number, curr: number) => {
+		return curr !== 0 ? acc++ : acc;
+	}, 0);
 
 	if (isOpponentSlot(activePlayer, board, coord)) {
-		const capturedPieces = state.getIn(['capturedPieces', activePlayerKey]);
-		const nextCapturedPieces = capturedPieces.map((piece: any) => {
-			if (piece === 0 && !updated) {
-				updated = true;
-				return getSlotValue(board, coord);
-			} else {
-				return piece;
+		const slot = c.EMPTY_SLOT.merge(fromJS({
+			piece: {
+				player: activePlayer === Player.BLUE ? Player.RED : Player.BLUE,
+				piece: activePlayer === Player.BLUE ? Piece.RED_PAWN : Piece.BLUE_PAWN
 			}
-		});
-
-		const nextState = state.setIn(['capturedPieces', activePlayerKey], nextCapturedPieces);
+		}));
+		const nextState = state.setIn(['capturedPieces', activePlayerKey, capturedSize], slot);
 		return nextState.get('capturedPieces');
 	} else {
 		return state.get('capturedPieces');
@@ -113,24 +122,33 @@ const _getNextCapturedPieces = (state: any, coord: Coord) => {
 
 const _getNextBoard = (state: any, payload: any) => {
 	const board = state.get('board');
-	const srcCoord = payload.srcCoord;
-	const targetCoord = payload.targetCoord;
+	const { sourceSlot, targetSlot } = payload;
+	const sourceCoord = sourceSlot.get('coord');
+	const targetCoord = targetSlot.get('coord');
 
-	return board.updateIn([srcCoord.get('x'), srcCoord.get('y')], () => c.EMPTY)
-				.updateIn([targetCoord.get('x'), targetCoord.get('y')], () => getSlotValue(board, srcCoord));
+	return board.map((row: any, x: number) => {
+		return row.map((slot: any, y: number) => {
+			const coord = slot.get('coord');
+
+			if (coord.equals(targetCoord)) {
+				return sourceSlot.set('coord', slot.get('coord'));
+			}
+			if (coord.equals(sourceCoord)) {
+				return slot.merge(c.EMPTY_SLOT);
+			}
+			return slot.merge({
+				isActive: false,
+				isCandidate: false
+			});
+		});
+	});
 };
 
-const _getNextMoveHistory = (state: any, payload: any) => {
+const _getNextMoveHistory = (state: any, sourceCoord: Coord, targetCoord: Coord) => {
 	return state.get('moveHistory').update((list: any) => {
 		return list.push(Map({
-			srcCoord: Map({
-				x: payload.srcCoord.get('x'),
-				y: payload.srcCoord.get('y'),
-			}),
-			targetCoord: Map({
-				x: payload.targetCoord.get('x'),
-				y: payload.targetCoord.get('y')
-			}),
+			sourceCoord,
+			targetCoord,
 			player: state.get('activePlayer')
 		}));
 	});
@@ -139,22 +157,22 @@ const _getNextMoveHistory = (state: any, payload: any) => {
 const _hasMaster = (board: any, piece: any) => {
 	let hasMaster = false;
 
-	for (var x = 0; x < board.size; x++) {
-		for (var y = 0; y < board.size; y++) {
-			if (board.getIn([x, y]) === piece) {
+	board.forEach((row: any, x: number) => {
+		row.forEach((slot: any, y: number) => {
+			if (slot.getIn(['piece', 'piece']) === piece) {
 				hasMaster = true;
 			}
-		}
-	}
+		});
+	});
 
 	return hasMaster;
 };
 
 const checkForWinner = (state: any) => {
-	const redWinner = !_hasMaster(state.get('board'), c.BLUE_MASTER);
-	const blueWinner = !_hasMaster(state.get('board'), c.RED_MASTER);
+	const redWinner = !_hasMaster(state.get('board'), Piece.BLUE_MASTER);
+	const blueWinner = !_hasMaster(state.get('board'), Piece.RED_MASTER);
 	if (blueWinner || redWinner) {
-		return state.set('winner', blueWinner ? c.BLUE : c.RED);
+		return state.set('winner', blueWinner ? Player.BLUE : Player.RED);
 	}
 
 	return state.set('winner', null);
@@ -167,12 +185,13 @@ const checkForWinner = (state: any) => {
  * @param {String} moveCard state property name of the move card to be exchanged.
  */
 const performMove = (state: any, payload: any) => {
+	const sourceCoord = payload.sourceSlot.get('coord');
+	const targetCoord = payload.targetSlot.get('coord');
 	const nextState = Map({
 		board: _getNextBoard(state, payload),
-		capturedPieces: _getNextCapturedPieces(state, payload.targetCoord),
-		moveHistory: _getNextMoveHistory(state, payload),
-		lastMoveRelativeCoords: getRelativeCoord(payload.targetCoord, payload.srcCoord),
-		activeSlotCoord: c.EMPTY_COORD,
+		capturedPieces: _getNextCapturedPieces(state, targetCoord),
+		moveHistory: _getNextMoveHistory(state, sourceCoord, targetCoord),
+		lastMoveRelativeCoords: getRelativeCoord(sourceCoord, targetCoord),
 		candidateCoords: List()
 	});
 
@@ -184,7 +203,7 @@ const performMove = (state: any, payload: any) => {
  * note: toggling the active player here makes sense becuase anytime a
  * card exchange happens it's the other players trun.
  * @param {String} state application state Map.
- * @param {String} moveCard state property name of the move card to be exchanged.
+ * @param {String} moveCard state property name of the move card to be exchanged
  */
 const _swapMoveCard = (state: any, moveCard: string) => {
 	return Map({
@@ -195,18 +214,18 @@ const _swapMoveCard = (state: any, moveCard: string) => {
 };
 
 const _swapMoveCard1 = (state: any) => {
-	if (state.get('activePlayer') === c.BLUE) {
-		return _swapMoveCard(state, c.BLUE_MOVE_CARD_1);
+	if (state.get('activePlayer') === Player.BLUE) {
+		return _swapMoveCard(state, MoveCards.BLUE_MOVE_CARD_1);
 	} else {
-		return _swapMoveCard(state, c.RED_MOVE_CARD_1);
+		return _swapMoveCard(state, MoveCards.RED_MOVE_CARD_1);
 	}
 };
 
 const _swapMoveCard2 = (state: any) => {
-	if (state.get('activePlayer') === c.BLUE) {
-		return _swapMoveCard(state, c.BLUE_MOVE_CARD_2);
+	if (state.get('activePlayer') === Player.BLUE) {
+		return _swapMoveCard(state, MoveCards.BLUE_MOVE_CARD_2);
 	} else {
-		return _swapMoveCard(state, c.RED_MOVE_CARD_2);
+		return _swapMoveCard(state, MoveCards.RED_MOVE_CARD_2);
 	}
 };
 
@@ -214,18 +233,16 @@ const autoMoveCardExchange = (state: any) => {
 	let nextState;
 	const moveCards = getMoveCards(state);
 	const lastMoveCoords = state.get('lastMoveRelativeCoords');
+	const moveCard1 = getRelativeCoordsByMoveCard(moveCards.get(0));
+	const moveCard2 = getRelativeCoordsByMoveCard(moveCards.get(1));
+	const card1Results = relativeCoordSearch(lastMoveCoords, moveCard1);
+	const card2Results = relativeCoordSearch(lastMoveCoords, moveCard2);
 
-	const moveCard1RelativeCoords = getRelativeCoordsByMoveCard(moveCards.get(0));
-	const moveCard2RelativeCoords = getRelativeCoordsByMoveCard(moveCards.get(1));
-
-	const card1SearchResults = relativeCoordSearch(lastMoveCoords, moveCard1RelativeCoords);
-	const card2SearchResults = relativeCoordSearch(lastMoveCoords, moveCard2RelativeCoords);
-
-	if (card1SearchResults && card2SearchResults) {
+	if (card1Results && card2Results) {
 		return state.set('isChoosingMoveCard', true);
-	} else if (card1SearchResults) {
+	} else if (card1Results) {
 		nextState = _swapMoveCard1(state);
-	} else if (card2SearchResults) {
+	} else if (card2Results) {
 		nextState = _swapMoveCard2(state);
 	} else {
 		throw new Error('noOP, both move card coords did not match last move coords');
@@ -234,13 +251,30 @@ const autoMoveCardExchange = (state: any) => {
 	return state.merge(nextState);
 };
 
-const moveCardExchange = (state: any, moveCard: string) => {
-	return state.merge(_swapMoveCard(state, moveCard));
+const moveCardExchange = (state: any, payload: any) => {
+	return state.merge(_swapMoveCard(state, payload.moveCard));
 };
 
 const resetGame = (state: any) => {
 	return state.merge(getInitialGameState(state));
 };
+
+export const DEFAULT_STATE = Map({
+	board: c.DEFAULT_BOARD,
+	capturedPieces: c.DEFAULT_CAPTURED_PIECES,
+	swapCard: c.DEFAULT_CARD,
+	redMoveCard1: c.DEFAULT_CARD,
+	redMoveCard2: c.DEFAULT_CARD,
+	blueMoveCard1: c.DEFAULT_CARD,
+	blueMoveCard2: c.DEFAULT_CARD,
+	activeSlot: c.EMPTY_SLOT,
+	activePlayer: null,
+	moveHistory: List(),
+	winner: false,
+	isChoosingMoveCard: false,
+	isComputerMoveScheduled: false,
+	mode: Mode.COMPUTER
+});
 
 const gameReducer = (state = DEFAULT_STATE, action: any) => {
 	switch (action.type) {
@@ -253,7 +287,7 @@ const gameReducer = (state = DEFAULT_STATE, action: any) => {
 		case AUTO_MOVE_CARD_EXCHANGE:
 			return autoMoveCardExchange(state);
 		case MOVE_CARD_EXCHANGE:
-			return moveCardExchange(state, action.payload.moveCard);
+			return moveCardExchange(state, action.payload);
 		case CHECK_FOR_WINNER:
 			return checkForWinner(state);
 		case RESET_GAME:

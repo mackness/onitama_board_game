@@ -1,46 +1,57 @@
 import { Map, List } from 'immutable';
-import c from '../constants/game-constants';
-import { Board, Coord } from '../typings';
+import * as c from '../constants/game-constants';
+import { MoveCard } from '../typings';
+import { Board, Coord, Player } from '../typings';
 
 /**
- * Gets the value of a given slot.
- * @param {List} board - a 2d matrix of Immutable Lists.
+ * Gets the value of a given slot properties.
+ * @param {Board} board - a 2d matrix of Immutable Lists.
  * @param {Map} coords - a Map of x y coordinates.
  */
-export function getSlotValue(board: Board, coord: any)  {
-	return board.getIn([coord.get('x'), coord.get('y')]);
+export function getSlotProperty(board: Board, coord: Coord, property: string): any  {
+	const slot = board.getIn([coord.get('x'), coord.get('y')]);
+	return slot.get(property);
+}
+
+/**
+ * Gets the value of a given slot properties.
+ * @param {Board} board - a 2d matrix of Immutable Lists.
+ * @param {Map} coords - a Map of x y coordinates.
+ */
+export function getPieceProperty(board: Board, coord: Coord, property: string): any  {
+	const slot = board.getIn([coord.get('x'), coord.get('y')]);
+	return slot.getIn(['piece', property]);
 }
 
 /**
  * Get the absolute coords for all possible moves on a move card.
- * note: the absolute coordinate list will only contain in bounds coordinates
  * @param {List} card - a 5x5 matrix representing a move card.
  */
 export function getAbsoluteCoords(card: any) {
-	let absCoords = [];
-	for (var x = 0; x < card.size; x++) {
-		for (var y = 0; y < card.get(x).size; y++) {
-			if (card.getIn([x, y]) !== c.EMPTY && card.getIn([x, y]) !== c.START) {
+	let absCoords: any[] = [];
+	card.forEach((row: any, x: number) => {
+		row.forEach((slot: any, y: number) => {
+			if (slot !== MoveCard.EMPTY && slot !== MoveCard.START) {
 				absCoords.push(Map({x, y}));
 			}
-		}
-	}
+		});
+	});
 	return absCoords;
 }
 
 /**
  * Get the coords of active board pieces for a given player in order to make a move.
  * @return {List} a list of coordinates of all active board pieces.
- */	
+ */
 export function getSourceCoords(board: any, player: any) {
-	let sourceCoords = [];
-	for (var x = 0; x < board.size; x++) {
-		for (var y = 0; y < board.get(x).size; y++) {
-			if (board.getIn([x, y]) === player) {
+	let sourceCoords: any[] = [];
+	board.forEach((row: any, x: number) => {
+		row.forEach((slot: any, y: number) => {
+			if (slot.getIn(['piece', 'player']) === player) {
 				sourceCoords.push(Map({x, y}));
 			}
-		}
-	}
+		});
+	});
 	return sourceCoords;
 }
 
@@ -51,8 +62,8 @@ export function getSourceCoords(board: any, player: any) {
  */
 export function getRelativeCoord(a: Coord, b: Coord) {
 	return Map({
-		x: a.get('x') - b.get('x'),
-		y: a.get('y') - b.get('y')
+		x: b.get('x') - a.get('x'),
+		y: b.get('y') - a.get('y')
 	});
 }
 
@@ -87,7 +98,7 @@ export function shuffle(a: Array<object>) {
  * @param {Number} activePlayer number that represents currently active player.
  */
 export function toggleActivePlayer(activePlayer: number) {
-	return activePlayer === c.BLUE ? c.RED : c.BLUE;
+	return activePlayer === Player.BLUE ? Player.RED : Player.BLUE;
 }
 
 /**
@@ -96,7 +107,7 @@ export function toggleActivePlayer(activePlayer: number) {
  * @return {List} list of move cards.
  */
 export function getMoveCards(state: any) {
-	let isBlueActive = state.get('activePlayer') === c.BLUE;
+	let isBlueActive = state.get('activePlayer') === Player.BLUE;
 	return List([
 		state.getIn([isBlueActive ? 'blueMoveCard1' : 'redMoveCard1', 'card']),
 		state.getIn([isBlueActive ? 'blueMoveCard2' : 'redMoveCard2', 'card'])
@@ -119,6 +130,8 @@ export function getRelativeCoordsByMoveCard(moveCard: any) {
  * @return {Array} array of possible moves
  */
 export function getCandidateCoords(state: any, acoord: any) {
+	const board = state.get('board');
+	const activePlayer = state.get('activePlayer');
 	const moveCards = getMoveCards(state);
 	const moveCard1RelativeCoords = getRelativeCoordsByMoveCard(moveCards.get(0));
 	const moveCard2RelativeCoords = getRelativeCoordsByMoveCard(moveCards.get(1));
@@ -133,10 +146,10 @@ export function getCandidateCoords(state: any, acoord: any) {
 		});
 	}).filter((coord: any) => {
 		return (
-			(coord.get('x') >= 0 && coord.get('x') <= 4) &&
-			(coord.get('y') >= 0 && coord.get('y') <= 4) &&
-			(isOpponentSlot(state.get('activePlayer'), state.get('board'), coord) ||
-			getSlotValue(state.get('board'), coord) === c.EMPTY)
+			(coord.get('x') >= 0 && coord.get('x') <= board.size - 1) &&
+			(coord.get('y') >= 0 && coord.get('y') <= board.size - 1) &&
+			(isOpponentSlot(activePlayer, board, coord) ||
+			getPieceProperty(board, coord, 'player') !== activePlayer)
 		);
 	});
 }
@@ -161,22 +174,16 @@ export function relativeCoordSearch(moveCoords: Coord, cardCoords: any) {
 }
 
 /**
- * given the active player and a coord, determine if the slot belongs to the opponent.
- * note: if blue is active then the value should be less than 150 (red master)
- * if red is active, the value should be less than or equal to 250 (blue master) and greater than 150 (red master)
+ * Determine if a slot belongs to the opponent.
  * @param {number} activePlayer the currently active player
  * @param {Map} board an x, y coordiate pair
  * @param {Map} candidateCoord an x, y coordiate pair
  * @return {boolean} is opponent slot
  */
 export function isOpponentSlot(activePlayer: number, board: any, coord: any): boolean {
-	const isBlueActive = activePlayer === c.BLUE;
-	const slotValue = getSlotValue(board, coord);
-	if (isBlueActive) {
-		return slotValue <= c.RED_MASTER && slotValue > 0;
-	} else {
-		return slotValue <= c.BLUE_MASTER && slotValue > c.RED_MASTER;
-	}
+	const piece = getPieceProperty(board, coord, 'player');
+	const opponent = activePlayer === Player.BLUE ? Player.RED : Player.BLUE;
+	return piece === opponent;
 }
 
 /**
@@ -188,4 +195,17 @@ export function isOpponentSlot(activePlayer: number, board: any, coord: any): bo
  */
 export function getRandomInt(min: number, max: number): number {
 	return Math.floor(Math.random() * (max - min) + min);
+}
+
+/**
+ * applies x and y coordiates to board slots when game is initialized
+ * @param {Board} board data structure
+ * @return {Board} the game board
+ */
+export function sequenceBoard(board: any): Board {
+	return board.map((col: any, x: any) => {
+		return col.map((slot: any, y: any) => {
+			return slot.merge({coord: Map({x, y})});
+		});
+	});
 }

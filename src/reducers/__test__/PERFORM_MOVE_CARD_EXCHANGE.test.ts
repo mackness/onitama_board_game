@@ -1,38 +1,28 @@
 import gameReducer from '../gameReducer';
-import { Map, fromJS, List } from 'immutable';
-import c from '../../constants/game-constants';
+import { Map, List } from 'immutable';
+import * as c from '../../constants/game-constants';
+import { Mode, Player } from '../../typings';
 import { MOVE_CARD_EXCHANGE } from '../../constants/action-constants';
 
-const DEFAULT_STATE = Map({
-	board: fromJS([
-		[c.RED, 0, 0, 0, c.BLUE],
-		[c.RED, 0, 0, 0, c.BLUE],
-		[c.RED_MASTER, 0, 0, 0, c.BLUE_MASTER],
-		[c.RED, 0, 0, 0, c.BLUE],
-		[c.RED, 0, 0, 0, c.BLUE]
-	]),
+export const DEFAULT_STATE = Map({
+	board: c.DEFAULT_BOARD,
+	capturedPieces: Map({
+		red: List([0, 0, 0, 0, 0]),
+		blue: List([0, 0, 0, 0, 0]),
+	}),
 	swapCard: c.DEFAULT_CARD,
 	redMoveCard1: c.DEFAULT_CARD,
 	redMoveCard2: c.DEFAULT_CARD,
-	blueMoveCard1: fromJS([
-		[0, 0, 0, 0, 0],
-		[0, 0, c.MOVE, 0, 0],
-		[0, c.MOVE, c.START, c.MOVE, 0],
-		[0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0]
-	]),
-	blueMoveCard2: fromJS([
-		[0, 0, 0, 0, 0],
-		[0, c.MOVE, 0, c.MOVE, 0],
-		[0, 0, c.START, 0, 0],
-		[0, 0, c.MOVE, 0, 0],
-		[0, 0, 0, 0, 0]
-	]),
-	activeSlotCoord: c.DEFAULT_CARD,
+	blueMoveCard1: c.DEFAULT_CARD,
+	blueMoveCard2: c.DEFAULT_CARD,
+	activeSlotCoord: c.EMPTY_COORD,
 	candidateCoords: List(),
-	activePlayer: c.BLUE,
+	activePlayer: null,
 	moveHistory: List(),
-	isChoosingMoveCard: false
+	winner: false,
+	isChoosingMoveCard: false,
+	isComputerMoveScheduled: false,
+	mode: Mode.COMPUTER
 });
 
 test('game reducer', () => {
@@ -50,6 +40,6 @@ test('game reducer', () => {
 		expect(nextState.get('swapCard')).not.toBe(null);
 
 		// the active player to be toggled
-		expect(nextState.get('activePlayer')).toBe(c.RED);
+		expect(nextState.get('activePlayer')).toBe(Player.RED);
 	});
 });
